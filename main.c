@@ -14,9 +14,12 @@
 typedef enum {MODE0 = 0, MODE1 = 1, MODE2 = 2, MODE3 = 3} Mode;
 typedef enum {STATE0 = 0, STATE1 = 1, STATE2 = 2, STATE3 = 3} State;
 
+#define userMode MODE1 //userMode(MODE0~MODExx),need confirm
+unsigned char brightness = 35; //brightness(0~100),brightness
+
 unsigned int second = 0;
 unsigned int hour = 0;
-unsigned char brightness = 40;
+
 bool relayStat = ON;
 bool isDimmingConfiged = FALSE;
 bool timeChanged = FALSE;
@@ -38,7 +41,12 @@ void DimmingMode(Mode mode)
 					state = STATE3;
 			break;		
 	
-			case MODE1:		break;
+			case MODE1:
+				if(hour >= 0 && hour < 6)
+					state = STATE1;
+				else if(hour >= 6)//(hour >= 6 && hour < 10)
+					state = STATE2;
+			break;
 			case MODE2: 	break;
 			case MODE3: 	break;
 			default:			break;
@@ -52,7 +60,7 @@ void DimmingMode(Mode mode)
 			case STATE0:	PWM_Config(100, 0);	break;//never run to STATE0
 			case STATE1:	PWM_Config(100, 100);	break;
 			case STATE2:	PWM_Config(100, brightness);	break;			
-			case STATE3:	PWM_Config(100, 20);	break;			
+			case STATE3:	PWM_Config(100, 100);	break;			
 			default: break;
 		}
 	}	else;//when state no change, do nothing
@@ -130,7 +138,7 @@ main()
 		}
 		else;//when the the lux is between ON/OFF, do nothing
 		
-		DimmingMode(MODE0);
+		DimmingMode(userMode);
 		Delay();
 	}
 }

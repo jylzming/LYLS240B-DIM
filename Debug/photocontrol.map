@@ -1,5 +1,5 @@
 
-Map of Debug\photocontrol.sm8 from link file Debug\photocontrol.lkf - Mon Jul 02 20:57:24 2018
+Map of Debug\photocontrol.sm8 from link file Debug\photocontrol.lkf - Mon Aug 13 09:11:12 2018
 
 
                                --------
@@ -7,7 +7,7 @@ Map of Debug\photocontrol.sm8 from link file Debug\photocontrol.lkf - Mon Jul 02
                                --------
 
 start 00008080 end 00008084 length     4 segment .const
-start 0000809d end 00008584 length  1255 segment .text
+start 0000809d end 000085a5 length  1288 segment .text
 start 00004000 end 00004000 length     0 segment .eeprom
 start 00000000 end 00000011 length    17 segment .bsct, initialized
 start 0000808c end 0000809d length    17 segment .bsct, from
@@ -40,39 +40,39 @@ start 00008142 end 00008190 length    78 section .text
 start 000023de end 000047cf length  9201 section .debug
 
 Debug\main.o:
-start 00008190 end 00008338 length   424 section .text
+start 00008190 end 00008359 length   457 section .text
 start 00000000 end 00000011 length    17 section .bsct
 start 00000011 end 00000012 length     1 section .ubsct
 start 000047cf end 00006e86 length  9911 section .debug
 
 Debug\pwm.o:
-start 00008338 end 000083f2 length   186 section .text
+start 00008359 end 00008413 length   186 section .text
 start 00006e86 end 000092b6 length  9264 section .debug
 
 Debug\relay.o:
-start 000083f2 end 000083ff length    13 section .text
+start 00008413 end 00008420 length    13 section .text
 start 000092b6 end 0000b644 length  9102 section .debug
 
 (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)imul.o:
-start 000083ff end 00008420 length    33 section .text
+start 00008420 end 00008441 length    33 section .text
 
 (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)lreg.o:
 start 00000012 end 00000016 length     4 section .ubsct
 
 (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)ludiv.o:
-start 00008420 end 00008434 length    20 section .text
+start 00008441 end 00008455 length    20 section .text
 
 (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)ldiv.o:
-start 00008434 end 0000851f length   235 section .text
+start 00008455 end 00008540 length   235 section .text
 
 (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)lgneg.o:
-start 0000851f end 00008532 length    19 section .text
+start 00008540 end 00008553 length    19 section .text
 
 (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)lneg.o:
-start 00008532 end 00008547 length    21 section .text
+start 00008553 end 00008568 length    21 section .text
 
 (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)umul.o:
-start 00008547 end 00008583 length    60 section .text
+start 00008568 end 000085a4 length    60 section .text
 
 (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)xreg.o:
 start 00000016 end 00000019 length     3 section .ubsct
@@ -81,7 +81,7 @@ start 00000016 end 00000019 length     3 section .ubsct
 start 00000019 end 0000001c length     3 section .ubsct
 
 Debug\stm8_interrupt_vector.o:
-start 00008583 end 00008584 length     1 section .text
+start 000085a4 end 000085a5 length     1 section .text
 start 0000b644 end 0000b7af length   363 section .debug
 start 00008000 end 00008080 length   128 section .const
 
@@ -354,12 +354,12 @@ _PD_ODR_4               00500f:4   defined in Debug\adc.o
 _PD_ODR_5               00500f:5   defined in Debug\adc.o
 _PD_ODR_6               00500f:6   defined in Debug\adc.o
 _PD_ODR_7               00500f:7   defined in Debug\adc.o
-_PWM_Config             00008345   defined in Debug\pwm.o section .text
+_PWM_Config             00008366   defined in Debug\pwm.o section .text
                                    used in Debug\main.o
-_PWM_GPIO_Config        00008338   defined in Debug\pwm.o section .text
+_PWM_GPIO_Config        00008359   defined in Debug\pwm.o section .text
                                    used in Debug\main.o
 _RST_SR                 000050b3   defined in Debug\adc.o
-_Rly_GPIO_Config        000083f2   defined in Debug\relay.o section .text
+_Rly_GPIO_Config        00008413   defined in Debug\relay.o section .text
                                    used in Debug\main.o
 _SPI_CR1                00005200   defined in Debug\adc.o
 _SPI_CR2                00005201   defined in Debug\adc.o
@@ -471,34 +471,34 @@ __startmem              00000100   defined in command file section .bss
 __stext                 0000809d   defined in C:\Program Files (x86)\COSMIC\CXSTM8\Lib\crtsi0.sm8 section .text
                                    used in Debug\stm8_interrupt_vector.o
 __vectab                00008000   defined in Debug\stm8_interrupt_vector.o section .const
-_brightness             00000004   defined in Debug\main.o section .bsct, initialized
+_brightness             00000000   defined in Debug\main.o section .bsct, initialized
 _exit                   000080e6   defined in C:\Program Files (x86)\COSMIC\CXSTM8\Lib\crtsi0.sm8 section .text
-_hour                   00000002   defined in Debug\main.o section .bsct, initialized
+_hour                   00000003   defined in Debug\main.o section .bsct, initialized
 _isDimmingConfiged      00000006   defined in Debug\main.o section .bsct, initialized
-_main                   00008214   defined in Debug\main.o section .text
+_main                   00008234   defined in Debug\main.o section .text
                                    used in C:\Program Files (x86)\COSMIC\CXSTM8\Lib\crtsi0.sm8
 _relayStat              00000005   defined in Debug\main.o section .bsct, initialized
-_second                 00000000   defined in Debug\main.o section .bsct, initialized
+_second                 00000001   defined in Debug\main.o section .bsct, initialized
 _state                  00000011   defined in Debug\main.o section .ubsct
 _timeChanged            00000007   defined in Debug\main.o section .bsct, initialized
-c_divsl                 00008434   defined in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)ldiv.o section .text
+c_divsl                 00008455   defined in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)ldiv.o section .text
                                    *** not used ***
-c_divul                 0000844b   defined in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)ldiv.o section .text
+c_divul                 0000846c   defined in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)ldiv.o section .text
                                    used in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)ludiv.o
-c_imul                  000083ff   defined in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)imul.o section .text
+c_imul                  00008420   defined in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)imul.o section .text
                                    used in Debug\pwm.o
-c_lgneg                 0000851f   defined in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)lgneg.o section .text
+c_lgneg                 00008540   defined in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)lgneg.o section .text
                                    used in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)ldiv.o
-c_lneg                  00008532   defined in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)lneg.o section .text
+c_lneg                  00008553   defined in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)lneg.o section .text
                                    used in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)ldiv.o
 c_lreg                  00000012   defined in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)lreg.o section .ubsct
                                    used in Debug\adc.o
                                            (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)ldiv.o
                                            (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)lneg.o
                                            (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)umul.o
-c_ludv                  00008420   defined in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)ludiv.o section .text
+c_ludv                  00008441   defined in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)ludiv.o section .text
                                    used in Debug\adc.o
-c_umul                  00008547   defined in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)umul.o section .text
+c_umul                  00008568   defined in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)umul.o section .text
                                    used in Debug\adc.o
 c_x                     00000016   defined in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)xreg.o section .ubsct
                                    used in C:\Program Files (x86)\COSMIC\CXSTM8\Lib\crtsi0.sm8
@@ -508,6 +508,6 @@ c_x                     00000016   defined in (C:\Program Files (x86)\COSMIC\CXS
 c_y                     00000019   defined in (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)yreg.o section .ubsct
                                    used in C:\Program Files (x86)\COSMIC\CXSTM8\Lib\crtsi0.sm8
                                            (C:\Program Files (x86)\COSMIC\CXSTM8\Lib\libm0.sm8)umul.o
-f_NonHandledInterrupt   00008583   defined in Debug\stm8_interrupt_vector.o section .text
-f_TIM1_UPD_IRQHandler   00008317   defined in Debug\main.o section .text
+f_NonHandledInterrupt   000085a4   defined in Debug\stm8_interrupt_vector.o section .text
+f_TIM1_UPD_IRQHandler   00008338   defined in Debug\main.o section .text
                                    used in Debug\stm8_interrupt_vector.o

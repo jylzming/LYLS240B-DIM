@@ -7,7 +7,7 @@
 void Delay(void)
 {
 	unsigned int i,j;
-	for(i=0; i<512; i++)
+	for(i=0; i<1024; i++)
 	{
 		for(j=0; j<512; j++); 
 	}

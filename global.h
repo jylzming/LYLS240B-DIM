@@ -1,8 +1,8 @@
 #ifndef _GLOBAL_H_
 #define _GLOBAL_H_
 
-#define OFF_LUX 	2500
-#define ON_LUX 		3550
+#define OFF_LUX 	4450  //60lux
+#define ON_LUX 		4750  //16lux
 #define ON				0
 #define OFF				1
 
