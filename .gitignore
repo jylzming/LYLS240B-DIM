@@ -4,7 +4,6 @@
 *.spy
 *.pdg
 *.mak
-*.stp
 *.xml
 ./Debug
 ./Release
