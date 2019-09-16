@@ -11,11 +11,11 @@
 #include "delay.h"
 #include "global.h"
 
-typedef enum {MODE0 = 0, MODE1 = 1, MODE2 = 2, MODE3 = 3, MODE4 = 4, MODE5 = 5, MODE6 = 6} Mode;
+typedef enum {MODE0 = 0, MODE1 = 1, MODE2 = 2, MODE3 = 3, MODE4 = 4, MODE5 = 5} Mode;
 typedef enum {STATE0 = 0, STATE1 = 1, STATE2 = 2, STATE3 = 3, STATE4 = 4, STATE5 = 5} State;
 
 
-unsigned char brightness = BRIGHTNESS; //brightness(0~100),brightness should be add about 3 is correct
+unsigned char brightness =BRIGHTNESS; //brightness(0~100),brightness should be add about 3 is correct
 
 unsigned int second = 0;
 unsigned int hour = 0;
@@ -56,17 +56,12 @@ void DimmingMode(Mode mode)
 			break;	
 			
 			case MODE3: 	
-				if(second >= 0 && second < 3)
+				if(second >= 0 && second < 10)
 					state = STATE1;
-				else if(second >= 3 && second < 6)//(hour >= 6 && hour < 10)
+				else if(second >= 10 && second < 20)//(hour >= 6 && hour < 10)
 					state = STATE2;
-				else if(second >= 6 && second < 9) 
-					state = STATE3;	
-				else
-				{
-					state = STATE1;	
-					second = 0;
-				}
+				else if(second >= 20) 
+					state = STATE3;		
 			break;
 
 			case MODE4:
@@ -94,17 +89,6 @@ void DimmingMode(Mode mode)
 				else
 					state = STATE5;
 			break;
-
-			case MODE6:
-				if(hour >= 0 && hour < 4)//4hours
-					state = STATE1;
-				else if(hour >= 4 && hour < 7)//3hours
-					state = STATE2;
-				else if(hour >= 7 && hour < 11)//4hours
-					state = STATE3;					
-				else
-					state = STATE4;
-			break;
 			
 			default:	break;
 		}
@@ -125,18 +109,6 @@ void DimmingMode(Mode mode)
 				default: break;
 			}		
 		}
-		else if(mode == MODE6)
-		{
-			switch (state)
-			{
-				case STATE0:	PWM_Config(100, 0);	break;//never run to STATE0
-				case STATE1:	PWM_Config(100, 100);	break;
-				case STATE2:	PWM_Config(100, 60);	break;			
-				case STATE3:	PWM_Config(100, 40+2);	break;
-				case STATE4:	PWM_Config(100, 50+1);	break;
-				default: break;
-			}		
-		}		
 		else
 		{
 			switch (state)
@@ -144,7 +116,7 @@ void DimmingMode(Mode mode)
 				case STATE0:	PWM_Config(100, 0);	break;//never run to STATE0
 				case STATE1:	PWM_Config(100, 100);	break;
 				case STATE2:	PWM_Config(100, brightness);	break;			
-				case STATE3:	PWM_Config(100, 80);	break;			
+				case STATE3:	PWM_Config(100, 100);	break;			
 				default: break;
 			}
 		}
@@ -155,7 +127,7 @@ void DimmingMode(Mode mode)
 
 main()
 {
-	volatile static unsigned char adcCount = 0;
+	unsigned char i = 0;
 	unsigned int x,y;
 	bool exRelayStat = OFF;
 	static unsigned int adcData[5] = {0,0,0,0,0};
@@ -189,8 +161,8 @@ main()
 	
 	while (1)
 	{
-		adcData[adcCount++] = GetADC();
-		if(adcCount > 4)	adcCount = 0;
+		adcData[i++] = GetADC();
+		if(i > 4)	i = 0;
 		
 		//if it's daytime, turn the light off
 		if(adcData[0] < OFF_LUX \
@@ -215,7 +187,7 @@ main()
 		else if(adcData[0] > ON_LUX \
 		&& adcData[1] > ON_LUX \
 		&& adcData[2] > ON_LUX \
-		&& adcData[3] > ON_LUX \
+		&& adcData[3] > ON_LUX\
 		&& adcData[4] > ON_LUX)
 		{
 			if(LIGHT == OFF)//only when light on/off change 

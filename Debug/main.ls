@@ -2,7 +2,7 @@
    2                     ; Generator V4.2.4 - 19 Dec 2007
 3213                     	bsct
 3214  0000               _brightness:
-3215  0000 23            	dc.b	35
+3215  0000 2b            	dc.b	43
 3216  0001               _second:
 3217  0001 0000          	dc.w	0
 3218  0003               _hour:
@@ -15,348 +15,711 @@
 3225  0007 00            	dc.b	0
 3226  0008               L3712_ex_state:
 3227  0008 00            	dc.b	0
-3316                     ; 29 void DimmingMode(Mode mode)
-3316                     ; 30 {
-3318                     	switch	.text
-3319  0000               _DimmingMode:
-3321  0000 88            	push	a
-3322       00000000      OFST:	set	0
-3325                     ; 31 	if(LIGHT == ON)
-3327                     	btst	_PC_ODR_5
-3328  0006 2550          	jrult	L1622
-3329                     ; 33 		switch (mode)
-3331  0008 7b01          	ld	a,(OFST+1,sp)
-3333                     ; 52 			default:			break;
-3334  000a 4d            	tnz	a
-3335  000b 2705          	jreq	L5712
-3336  000d 4a            	dec	a
-3337  000e 2730          	jreq	L7712
-3338  0010 2046          	jra	L1622
-3339  0012               L5712:
-3340                     ; 35 			case MODE0:
-3340                     ; 36 				if(hour >= 0 && hour < 6)
-3342  0012 be03          	ldw	x,_hour
-3343  0014 a30006        	cpw	x,#6
-3344  0017 2406          	jruge	L7622
-3345                     ; 37 					state = STATE1;
-3347  0019 35010000      	mov	_state,#1
-3349  001d 2039          	jra	L1622
-3350  001f               L7622:
-3351                     ; 38 				else if(hour >= 6 && hour < 10)//(hour >= 6 && hour < 10)
-3353  001f be03          	ldw	x,_hour
-3354  0021 a30006        	cpw	x,#6
-3355  0024 250d          	jrult	L3722
-3357  0026 be03          	ldw	x,_hour
-3358  0028 a3000a        	cpw	x,#10
-3359  002b 2406          	jruge	L3722
-3360                     ; 39 					state = STATE2;
-3362  002d 35020000      	mov	_state,#2
-3364  0031 2025          	jra	L1622
-3365  0033               L3722:
-3366                     ; 40 				else if(hour >= 10) 
-3368  0033 be03          	ldw	x,_hour
-3369  0035 a3000a        	cpw	x,#10
-3370  0038 251e          	jrult	L1622
-3371                     ; 41 					state = STATE3;
-3373  003a 35030000      	mov	_state,#3
-3374  003e 2018          	jra	L1622
-3375  0040               L7712:
-3376                     ; 44 			case MODE1:
-3376                     ; 45 				if(hour >= 0 && hour < 6)
-3378  0040 be03          	ldw	x,_hour
-3379  0042 a30006        	cpw	x,#6
-3380  0045 2406          	jruge	L1032
-3381                     ; 46 					state = STATE1;
-3383  0047 35010000      	mov	_state,#1
-3385  004b 200b          	jra	L1622
-3386  004d               L1032:
-3387                     ; 47 				else if(hour >= 6)//(hour >= 6 && hour < 10)
-3389  004d be03          	ldw	x,_hour
-3390  004f a30006        	cpw	x,#6
-3391  0052 2504          	jrult	L1622
-3392                     ; 48 					state = STATE2;
-3394  0054 35020000      	mov	_state,#2
-3395  0058               L1022:
-3396                     ; 50 			case MODE2: 	break;
-3398  0058               L3022:
-3399                     ; 51 			case MODE3: 	break;
-3401  0058               L5022:
-3402                     ; 52 			default:			break;
-3404  0058               L5622:
-3405  0058               L1622:
-3406                     ; 56 	if(ex_state != state)
-3408  0058 b608          	ld	a,L3712_ex_state
-3409  005a b100          	cp	a,_state
-3410  005c 2741          	jreq	L5132
-3411                     ; 58 		switch (state)
-3413  005e b600          	ld	a,_state
-3415                     ; 64 			default: break;
-3416  0060 4d            	tnz	a
-3417  0061 270b          	jreq	L7022
-3418  0063 4a            	dec	a
-3419  0064 2713          	jreq	L1122
-3420  0066 4a            	dec	a
-3421  0067 271d          	jreq	L3122
-3422  0069 4a            	dec	a
-3423  006a 2728          	jreq	L5122
-3424  006c 2031          	jra	L5132
-3425  006e               L7022:
-3426                     ; 60 			case STATE0:	PWM_Config(100, 0);	break;//never run to STATE0
-3428  006e 5f            	clrw	x
-3429  006f 89            	pushw	x
-3430  0070 ae0064        	ldw	x,#100
-3431  0073 cd0000        	call	_PWM_Config
-3433  0076 85            	popw	x
-3436  0077 2026          	jra	L5132
-3437  0079               L1122:
-3438                     ; 61 			case STATE1:	PWM_Config(100, 100);	break;
-3440  0079 ae0064        	ldw	x,#100
-3441  007c 89            	pushw	x
-3442  007d ae0064        	ldw	x,#100
-3443  0080 cd0000        	call	_PWM_Config
-3445  0083 85            	popw	x
-3448  0084 2019          	jra	L5132
-3449  0086               L3122:
-3450                     ; 62 			case STATE2:	PWM_Config(100, brightness);	break;			
-3452  0086 b600          	ld	a,_brightness
-3453  0088 5f            	clrw	x
-3454  0089 97            	ld	xl,a
-3455  008a 89            	pushw	x
-3456  008b ae0064        	ldw	x,#100
-3457  008e cd0000        	call	_PWM_Config
-3459  0091 85            	popw	x
-3462  0092 200b          	jra	L5132
-3463  0094               L5122:
-3464                     ; 63 			case STATE3:	PWM_Config(100, 100);	break;			
-3466  0094 ae0064        	ldw	x,#100
-3467  0097 89            	pushw	x
-3468  0098 ae0064        	ldw	x,#100
-3469  009b cd0000        	call	_PWM_Config
-3471  009e 85            	popw	x
-3474  009f               L7122:
-3475                     ; 64 			default: break;
-3477  009f               L3132:
-3479  009f               L5132:
-3480                     ; 67 	ex_state = state;
-3482  009f 450008        	mov	L3712_ex_state,_state
-3483                     ; 68 }
-3486  00a2 84            	pop	a
-3487  00a3 81            	ret
-3490                     	bsct
-3491  0009               L7132_adcData:
-3492  0009 0000          	dc.w	0
-3493  000b 0000          	dc.w	0
-3494  000d 0000          	dc.w	0
-3495  000f 0000          	dc.w	0
-3583                     ; 71 main()
-3583                     ; 72 {
-3584                     	switch	.text
-3585  00a4               _main:
-3587  00a4 89            	pushw	x
-3588       00000002      OFST:	set	2
-3591                     ; 73 	unsigned char i = 0;
-3593  00a5 0f02          	clr	(OFST+0,sp)
-3594                     ; 74 	bool exRelayStat = OFF;
-3596  00a7 a601          	ld	a,#1
-3597  00a9 6b01          	ld	(OFST-1,sp),a
-3598                     ; 77 	CLK_CKDIVR = 0x08;//f = f HSI RC输出/2=8MHz
-3600  00ab 350850c6      	mov	_CLK_CKDIVR,#8
-3601                     ; 80 	PWM_GPIO_Config();
-3603  00af cd0000        	call	_PWM_GPIO_Config
-3605                     ; 83 	InitADC();	
-3607  00b2 cd0000        	call	_InitADC
-3609                     ; 84 	adcData[0] = adcData[1] = adcData[2] = adcData[3] = GetADC();
-3611  00b5 cd0000        	call	_GetADC
-3613  00b8 bf0f          	ldw	L7132_adcData+6,x
-3614  00ba be0f          	ldw	x,L7132_adcData+6
-3615  00bc bf0d          	ldw	L7132_adcData+4,x
-3616  00be be0d          	ldw	x,L7132_adcData+4
-3617  00c0 bf0b          	ldw	L7132_adcData+2,x
-3618  00c2 be0b          	ldw	x,L7132_adcData+2
-3619  00c4 bf09          	ldw	L7132_adcData,x
-3620                     ; 85 	Rly_GPIO_Config();
-3622  00c6 cd0000        	call	_Rly_GPIO_Config
-3624                     ; 86 	if(adcData[0] < ON_LUX)//initial LIGHT IO
-3626  00c9 be09          	ldw	x,L7132_adcData
-3627  00cb a3128e        	cpw	x,#4750
-3628  00ce 240f          	jruge	L7532
-3629                     ; 88 		LIGHT = OFF;
-3631  00d0 721a500a      	bset	_PC_ODR_5
-3632                     ; 89 		PWM_Config(100, 0);//PWM off
-3634  00d4 5f            	clrw	x
-3635  00d5 89            	pushw	x
-3636  00d6 ae0064        	ldw	x,#100
-3637  00d9 cd0000        	call	_PWM_Config
-3639  00dc 85            	popw	x
-3641  00dd 200f          	jra	L1632
-3642  00df               L7532:
-3643                     ; 93 		LIGHT = ON;
-3645  00df 721b500a      	bres	_PC_ODR_5
-3646                     ; 94 		PWM_Config(100, 100);//PWM off
-3648  00e3 ae0064        	ldw	x,#100
-3649  00e6 89            	pushw	x
-3650  00e7 ae0064        	ldw	x,#100
-3651  00ea cd0000        	call	_PWM_Config
-3653  00ed 85            	popw	x
-3654  00ee               L1632:
-3655                     ; 98 	TIM1_Init();
-3657  00ee cd0000        	call	_TIM1_Init
-3659  00f1               L3632:
-3660                     ; 102 		adcData[i++] = GetADC();
-3662  00f1 cd0000        	call	_GetADC
-3664  00f4 7b02          	ld	a,(OFST+0,sp)
-3665  00f6 9097          	ld	yl,a
-3666  00f8 0c02          	inc	(OFST+0,sp)
-3667  00fa 909f          	ld	a,yl
-3668  00fc 905f          	clrw	y
-3669  00fe 9097          	ld	yl,a
-3670  0100 9058          	sllw	y
-3671  0102 90ef09        	ldw	(L7132_adcData,y),x
-3672                     ; 103 		if(i > 4)	i = 0;
-3674  0105 7b02          	ld	a,(OFST+0,sp)
-3675  0107 a105          	cp	a,#5
-3676  0109 2502          	jrult	L7632
-3679  010b 0f02          	clr	(OFST+0,sp)
-3680  010d               L7632:
-3681                     ; 106 		if(adcData[0] < OFF_LUX && adcData[1] < OFF_LUX && adcData[2] < OFF_LUX && adcData[3] < OFF_LUX)
-3683  010d be09          	ldw	x,L7132_adcData
-3684  010f a31162        	cpw	x,#4450
-3685  0112 243d          	jruge	L1732
-3687  0114 be0b          	ldw	x,L7132_adcData+2
-3688  0116 a31162        	cpw	x,#4450
-3689  0119 2436          	jruge	L1732
-3691  011b be0d          	ldw	x,L7132_adcData+4
-3692  011d a31162        	cpw	x,#4450
-3693  0120 242f          	jruge	L1732
-3695  0122 be0f          	ldw	x,L7132_adcData+6
-3696  0124 a31162        	cpw	x,#4450
-3697  0127 2428          	jruge	L1732
-3698                     ; 108 			if(LIGHT == ON)//only when light on/off change 
-3700                     	btst	_PC_ODR_5
-3701  012e 2511          	jrult	L3732
-3702                     ; 110 				LIGHT = OFF;//Relay_IO = 1
-3704  0130 721a500a      	bset	_PC_ODR_5
-3705                     ; 111 				PWM_Config(100, 0);//PWM off
-3707  0134 5f            	clrw	x
-3708  0135 89            	pushw	x
-3709  0136 ae0064        	ldw	x,#100
-3710  0139 cd0000        	call	_PWM_Config
-3712  013c 85            	popw	x
-3713                     ; 112 				TIM1_CR1 &= 0xFE;//stop time counter
-3715  013d 72115250      	bres	_TIM1_CR1,#0
-3716  0141               L3732:
-3717                     ; 114 			if(state != STATE0)
-3719  0141 3d00          	tnz	_state
-3720  0143 2704          	jreq	L5732
-3721                     ; 115 				ex_state = state = STATE0;
-3723  0145 3f00          	clr	_state
-3724  0147 3f08          	clr	L3712_ex_state
-3725  0149               L5732:
-3726                     ; 117 			second = 0;
-3728  0149 5f            	clrw	x
-3729  014a bf01          	ldw	_second,x
-3730                     ; 118 			hour = 0;
-3732  014c 5f            	clrw	x
-3733  014d bf03          	ldw	_hour,x
-3735  014f 204b          	jra	L7732
-3736  0151               L1732:
-3737                     ; 121 		else if(adcData[0] > ON_LUX && adcData[1] > ON_LUX && adcData[2] > ON_LUX && adcData[3] > ON_LUX)
-3739  0151 be09          	ldw	x,L7132_adcData
-3740  0153 a3128f        	cpw	x,#4751
-3741  0156 2544          	jrult	L7732
-3743  0158 be0b          	ldw	x,L7132_adcData+2
-3744  015a a3128f        	cpw	x,#4751
-3745  015d 253d          	jrult	L7732
-3747  015f be0d          	ldw	x,L7132_adcData+4
-3748  0161 a3128f        	cpw	x,#4751
-3749  0164 2536          	jrult	L7732
-3751  0166 be0f          	ldw	x,L7132_adcData+6
-3752  0168 a3128f        	cpw	x,#4751
-3753  016b 252f          	jrult	L7732
-3754                     ; 123 			if(LIGHT == OFF)//only when light on/off change 
-3756                     	btst	_PC_ODR_5
-3757  0172 2404          	jruge	L3042
-3758                     ; 125 				LIGHT = ON;
-3760  0174 721b500a      	bres	_PC_ODR_5
-3761  0178               L3042:
-3762                     ; 127 			if((TIM1_CR1 & 0x01) == 0)//if time counter not started, start counting
-3764  0178 c65250        	ld	a,_TIM1_CR1
-3765  017b a501          	bcp	a,#1
-3766  017d 260e          	jrne	L5042
-3767                     ; 129 				second = 0;
-3769  017f 5f            	clrw	x
-3770  0180 bf01          	ldw	_second,x
-3771                     ; 130 				hour = 0;
-3773  0182 5f            	clrw	x
-3774  0183 bf03          	ldw	_hour,x
-3775                     ; 131 				TIM1_CR1 |= 0x01;//start time counter
-3777  0185 72105250      	bset	_TIM1_CR1,#0
-3778                     ; 132 				TIM1_IER |= 0x01;				
-3780  0189 72105254      	bset	_TIM1_IER,#0
-3781  018d               L5042:
-3782                     ; 134 			if(state == STATE0)
-3784  018d 3d00          	tnz	_state
-3785  018f 260b          	jrne	L7732
-3786                     ; 136 				PWM_Config(100, 100);
-3788  0191 ae0064        	ldw	x,#100
-3789  0194 89            	pushw	x
-3790  0195 ae0064        	ldw	x,#100
-3791  0198 cd0000        	call	_PWM_Config
-3793  019b 85            	popw	x
-3794  019c               L7732:
-3795                     ; 141 		DimmingMode(userMode);
-3797  019c a601          	ld	a,#1
-3798  019e cd0000        	call	_DimmingMode
-3800                     ; 142 		Delay();
-3802  01a1 cd0000        	call	_Delay
-3805  01a4 acf100f1      	jpf	L3632
-3843                     ; 147 @far @interrupt void TIM1_UPD_IRQHandler(void)
-3843                     ; 148 {
-3845                     	switch	.text
-3846  01a8               f_TIM1_UPD_IRQHandler:
-3849       00000001      OFST:	set	1
-3850  01a8 88            	push	a
-3853                     ; 149 	unsigned char i = 0;
-3855  01a9 0f01          	clr	(OFST+0,sp)
-3856                     ; 150 	TIM1_SR1 &= 0xFE;//clear interrupt label
-3858  01ab 72115255      	bres	_TIM1_SR1,#0
-3859                     ; 151 	second++;
-3861  01af be01          	ldw	x,_second
-3862  01b1 1c0001        	addw	x,#1
-3863  01b4 bf01          	ldw	_second,x
-3864                     ; 152 	if(second == 3600)/***********待变更！！！！！***************/
-3866  01b6 be01          	ldw	x,_second
-3867  01b8 a30e10        	cpw	x,#3600
-3868  01bb 260a          	jrne	L1342
-3869                     ; 154 		second = 0;
-3871  01bd 5f            	clrw	x
-3872  01be bf01          	ldw	_second,x
-3873                     ; 155 		hour += 1;
-3875  01c0 be03          	ldw	x,_hour
-3876  01c2 1c0001        	addw	x,#1
-3877  01c5 bf03          	ldw	_hour,x
-3878  01c7               L1342:
-3879                     ; 159 }
-3882  01c7 84            	pop	a
-3883  01c8 80            	iret
-4008                     	xdef	f_TIM1_UPD_IRQHandler
-4009                     	xdef	_main
-4010                     	xdef	_DimmingMode
-4011                     	switch	.ubsct
-4012  0000               _state:
-4013  0000 00            	ds.b	1
-4014                     	xdef	_state
-4015                     	xdef	_relayStat
-4016                     	xdef	_timeChanged
-4017                     	xdef	_isDimmingConfiged
-4018                     	xdef	_brightness
-4019                     	xdef	_hour
-4020                     	xdef	_second
-4021                     	xref	_TIM1_Init
-4022                     	xref	_Delay
-4023                     	xref	_GetADC
-4024                     	xref	_InitADC
-4025                     	xref	_PWM_GPIO_Config
-4026                     	xref	_PWM_Config
-4027                     	xref	_Rly_GPIO_Config
-4047                     	end
+3338                     ; 29 void DimmingMode(Mode mode)
+3338                     ; 30 {
+3340                     	switch	.text
+3341  0000               _DimmingMode:
+3343  0000 88            	push	a
+3344       00000000      OFST:	set	0
+3347                     ; 31 	if(LIGHT == ON)
+3349                     	btst	_PC_ODR_5
+3350  0006 2403          	jruge	L6
+3351  0008 cc01ca        	jp	L7232
+3352  000b               L6:
+3353                     ; 33 		switch (mode)
+3355  000b 7b01          	ld	a,(OFST+1,sp)
+3357                     ; 109 			default:	break;
+3358  000d 4d            	tnz	a
+3359  000e 2722          	jreq	L5712
+3360  0010 4a            	dec	a
+3361  0011 2756          	jreq	L7712
+3362  0013 4a            	dec	a
+3363  0014 2774          	jreq	L1022
+3364  0016 4a            	dec	a
+3365  0017 2603cc00ab    	jreq	L3022
+3366  001c 4a            	dec	a
+3367  001d 2603          	jrne	L01
+3368  001f cc00f1        	jp	L5022
+3369  0022               L01:
+3370  0022 4a            	dec	a
+3371  0023 2603          	jrne	L21
+3372  0025 cc0142        	jp	L7022
+3373  0028               L21:
+3374  0028 4a            	dec	a
+3375  0029 2603          	jrne	L41
+3376  002b cc0191        	jp	L1122
+3377  002e               L41:
+3378  002e acca01ca      	jpf	L7232
+3379  0032               L5712:
+3380                     ; 35 			case MODE0:
+3380                     ; 36 				if(hour >= 0 && hour < 6)
+3382  0032 be03          	ldw	x,_hour
+3383  0034 a30006        	cpw	x,#6
+3384  0037 2408          	jruge	L5332
+3385                     ; 37 					state = STATE1;
+3387  0039 35010000      	mov	_state,#1
+3389  003d acca01ca      	jpf	L7232
+3390  0041               L5332:
+3391                     ; 38 				else if(hour >= 6 && hour < 10)//(hour >= 6 && hour < 10)
+3393  0041 be03          	ldw	x,_hour
+3394  0043 a30006        	cpw	x,#6
+3395  0046 250f          	jrult	L1432
+3397  0048 be03          	ldw	x,_hour
+3398  004a a3000a        	cpw	x,#10
+3399  004d 2408          	jruge	L1432
+3400                     ; 39 					state = STATE2;
+3402  004f 35020000      	mov	_state,#2
+3404  0053 acca01ca      	jpf	L7232
+3405  0057               L1432:
+3406                     ; 40 				else if(hour >= 10) 
+3408  0057 be03          	ldw	x,_hour
+3409  0059 a3000a        	cpw	x,#10
+3410  005c 2403          	jruge	L61
+3411  005e cc01ca        	jp	L7232
+3412  0061               L61:
+3413                     ; 41 					state = STATE3;
+3415  0061 35030000      	mov	_state,#3
+3416  0065 acca01ca      	jpf	L7232
+3417  0069               L7712:
+3418                     ; 44 			case MODE1:
+3418                     ; 45 				if(hour >= 0 && hour < 6)
+3420  0069 be03          	ldw	x,_hour
+3421  006b a30006        	cpw	x,#6
+3422  006e 2408          	jruge	L7432
+3423                     ; 46 					state = STATE1;
+3425  0070 35010000      	mov	_state,#1
+3427  0074 acca01ca      	jpf	L7232
+3428  0078               L7432:
+3429                     ; 47 				else if(hour >= 6)//(hour >= 6 && hour < 10)
+3431  0078 be03          	ldw	x,_hour
+3432  007a a30006        	cpw	x,#6
+3433  007d 2403          	jruge	L02
+3434  007f cc01ca        	jp	L7232
+3435  0082               L02:
+3436                     ; 48 					state = STATE2;
+3438  0082 35020000      	mov	_state,#2
+3439  0086 acca01ca      	jpf	L7232
+3440  008a               L1022:
+3441                     ; 51 			case MODE2:
+3441                     ; 52 				if(hour >= 0 && hour < 9)
+3443  008a be03          	ldw	x,_hour
+3444  008c a30009        	cpw	x,#9
+3445  008f 2408          	jruge	L5532
+3446                     ; 53 					state = STATE1;
+3448  0091 35010000      	mov	_state,#1
+3450  0095 acca01ca      	jpf	L7232
+3451  0099               L5532:
+3452                     ; 54 				else if(hour >= 9)//always in dimming state
+3454  0099 be03          	ldw	x,_hour
+3455  009b a30009        	cpw	x,#9
+3456  009e 2403          	jruge	L22
+3457  00a0 cc01ca        	jp	L7232
+3458  00a3               L22:
+3459                     ; 55 					state = STATE2;
+3461  00a3 35020000      	mov	_state,#2
+3462  00a7 acca01ca      	jpf	L7232
+3463  00ab               L3022:
+3464                     ; 58 			case MODE3: 	
+3464                     ; 59 				if(second >= 0 && second < 3)
+3466  00ab be01          	ldw	x,_second
+3467  00ad a30003        	cpw	x,#3
+3468  00b0 2408          	jruge	L3632
+3469                     ; 60 					state = STATE1;
+3471  00b2 35010000      	mov	_state,#1
+3473  00b6 acca01ca      	jpf	L7232
+3474  00ba               L3632:
+3475                     ; 61 				else if(second >= 3 && second < 6)//(hour >= 6 && hour < 10)
+3477  00ba be01          	ldw	x,_second
+3478  00bc a30003        	cpw	x,#3
+3479  00bf 250f          	jrult	L7632
+3481  00c1 be01          	ldw	x,_second
+3482  00c3 a30006        	cpw	x,#6
+3483  00c6 2408          	jruge	L7632
+3484                     ; 62 					state = STATE2;
+3486  00c8 35020000      	mov	_state,#2
+3488  00cc acca01ca      	jpf	L7232
+3489  00d0               L7632:
+3490                     ; 63 				else if(second >= 6 && second < 9) 
+3492  00d0 be01          	ldw	x,_second
+3493  00d2 a30006        	cpw	x,#6
+3494  00d5 250f          	jrult	L3732
+3496  00d7 be01          	ldw	x,_second
+3497  00d9 a30009        	cpw	x,#9
+3498  00dc 2408          	jruge	L3732
+3499                     ; 64 					state = STATE3;	
+3501  00de 35030000      	mov	_state,#3
+3503  00e2 acca01ca      	jpf	L7232
+3504  00e6               L3732:
+3505                     ; 67 					state = STATE1;	
+3507  00e6 35010000      	mov	_state,#1
+3508                     ; 68 					second = 0;
+3510  00ea 5f            	clrw	x
+3511  00eb bf01          	ldw	_second,x
+3512  00ed acca01ca      	jpf	L7232
+3513  00f1               L5022:
+3514                     ; 72 			case MODE4:
+3514                     ; 73 				if(hour >= 0 && hour < 1)//1hour
+3516  00f1 be03          	ldw	x,_hour
+3517  00f3 2608          	jrne	L7732
+3518                     ; 74 					state = STATE1;
+3520  00f5 35010000      	mov	_state,#1
+3522  00f9 acca01ca      	jpf	L7232
+3523  00fd               L7732:
+3524                     ; 75 				else if(hour >= 1 && hour < 4)//3hours
+3526  00fd be03          	ldw	x,_hour
+3527  00ff 270f          	jreq	L3042
+3529  0101 be03          	ldw	x,_hour
+3530  0103 a30004        	cpw	x,#4
+3531  0106 2408          	jruge	L3042
+3532                     ; 76 					state = STATE2;
+3534  0108 35020000      	mov	_state,#2
+3536  010c acca01ca      	jpf	L7232
+3537  0110               L3042:
+3538                     ; 77 				else if(hour >= 4 && hour < 5)//1hour
+3540  0110 be03          	ldw	x,_hour
+3541  0112 a30004        	cpw	x,#4
+3542  0115 250f          	jrult	L7042
+3544  0117 be03          	ldw	x,_hour
+3545  0119 a30005        	cpw	x,#5
+3546  011c 2408          	jruge	L7042
+3547                     ; 78 					state = STATE3;					
+3549  011e 35030000      	mov	_state,#3
+3551  0122 acca01ca      	jpf	L7232
+3552  0126               L7042:
+3553                     ; 79 				else if(hour >= 5 && hour < 12)//7hours
+3555  0126 be03          	ldw	x,_hour
+3556  0128 a30005        	cpw	x,#5
+3557  012b 250e          	jrult	L3142
+3559  012d be03          	ldw	x,_hour
+3560  012f a3000c        	cpw	x,#12
+3561  0132 2407          	jruge	L3142
+3562                     ; 80 					state = STATE4;
+3564  0134 35040000      	mov	_state,#4
+3566  0138 cc01ca        	jra	L7232
+3567  013b               L3142:
+3568                     ; 82 					state = STATE5;
+3570  013b 35050000      	mov	_state,#5
+3571  013f cc01ca        	jra	L7232
+3572  0142               L7022:
+3573                     ; 85 			case MODE5:
+3573                     ; 86 				if(hour >= 0 && hour < 5)//5hour
+3575  0142 be03          	ldw	x,_hour
+3576  0144 a30005        	cpw	x,#5
+3577  0147 2406          	jruge	L7142
+3578                     ; 87 					state = STATE1;
+3580  0149 35010000      	mov	_state,#1
+3582  014d 207b          	jra	L7232
+3583  014f               L7142:
+3584                     ; 88 				else if(hour >= 5 && hour < 7)//2hours
+3586  014f be03          	ldw	x,_hour
+3587  0151 a30005        	cpw	x,#5
+3588  0154 250d          	jrult	L3242
+3590  0156 be03          	ldw	x,_hour
+3591  0158 a30007        	cpw	x,#7
+3592  015b 2406          	jruge	L3242
+3593                     ; 89 					state = STATE2;
+3595  015d 35020000      	mov	_state,#2
+3597  0161 2067          	jra	L7232
+3598  0163               L3242:
+3599                     ; 90 				else if(hour >= 7 && hour < 11)//4hour
+3601  0163 be03          	ldw	x,_hour
+3602  0165 a30007        	cpw	x,#7
+3603  0168 250d          	jrult	L7242
+3605  016a be03          	ldw	x,_hour
+3606  016c a3000b        	cpw	x,#11
+3607  016f 2406          	jruge	L7242
+3608                     ; 91 					state = STATE3;					
+3610  0171 35030000      	mov	_state,#3
+3612  0175 2053          	jra	L7232
+3613  0177               L7242:
+3614                     ; 92 				else if(hour >= 11 && hour < 12)//1hours
+3616  0177 be03          	ldw	x,_hour
+3617  0179 a3000b        	cpw	x,#11
+3618  017c 250d          	jrult	L3342
+3620  017e be03          	ldw	x,_hour
+3621  0180 a3000c        	cpw	x,#12
+3622  0183 2406          	jruge	L3342
+3623                     ; 93 					state = STATE4;
+3625  0185 35040000      	mov	_state,#4
+3627  0189 203f          	jra	L7232
+3628  018b               L3342:
+3629                     ; 95 					state = STATE5;
+3631  018b 35050000      	mov	_state,#5
+3632  018f 2039          	jra	L7232
+3633  0191               L1122:
+3634                     ; 98 			case MODE6:
+3634                     ; 99 				if(hour >= 0 && hour < 4)//4hours
+3636  0191 be03          	ldw	x,_hour
+3637  0193 a30004        	cpw	x,#4
+3638  0196 2406          	jruge	L7342
+3639                     ; 100 					state = STATE1;
+3641  0198 35010000      	mov	_state,#1
+3643  019c 202c          	jra	L7232
+3644  019e               L7342:
+3645                     ; 101 				else if(hour >= 4 && hour < 7)//3hours
+3647  019e be03          	ldw	x,_hour
+3648  01a0 a30004        	cpw	x,#4
+3649  01a3 250d          	jrult	L3442
+3651  01a5 be03          	ldw	x,_hour
+3652  01a7 a30007        	cpw	x,#7
+3653  01aa 2406          	jruge	L3442
+3654                     ; 102 					state = STATE2;
+3656  01ac 35020000      	mov	_state,#2
+3658  01b0 2018          	jra	L7232
+3659  01b2               L3442:
+3660                     ; 103 				else if(hour >= 7 && hour < 11)//4hours
+3662  01b2 be03          	ldw	x,_hour
+3663  01b4 a30007        	cpw	x,#7
+3664  01b7 250d          	jrult	L7442
+3666  01b9 be03          	ldw	x,_hour
+3667  01bb a3000b        	cpw	x,#11
+3668  01be 2406          	jruge	L7442
+3669                     ; 104 					state = STATE3;					
+3671  01c0 35030000      	mov	_state,#3
+3673  01c4 2004          	jra	L7232
+3674  01c6               L7442:
+3675                     ; 106 					state = STATE4;
+3677  01c6 35040000      	mov	_state,#4
+3678  01ca               L3122:
+3679                     ; 109 			default:	break;
+3681  01ca               L3332:
+3682  01ca               L7232:
+3683                     ; 113 	if(ex_state != state)
+3685  01ca b608          	ld	a,L3712_ex_state
+3686  01cc b100          	cp	a,_state
+3687  01ce 2603          	jrne	L42
+3688  01d0 cc02ef        	jp	L1052
+3689  01d3               L42:
+3690                     ; 115 		if(mode == MODE5)
+3692  01d3 7b01          	ld	a,(OFST+1,sp)
+3693  01d5 a105          	cp	a,#5
+3694  01d7 2678          	jrne	L5542
+3695                     ; 117 			switch (state)
+3697  01d9 b600          	ld	a,_state
+3699                     ; 125 				default: break;
+3700  01db 4d            	tnz	a
+3701  01dc 2713          	jreq	L5122
+3702  01de 4a            	dec	a
+3703  01df 271d          	jreq	L7122
+3704  01e1 4a            	dec	a
+3705  01e2 2729          	jreq	L1222
+3706  01e4 4a            	dec	a
+3707  01e5 2735          	jreq	L3222
+3708  01e7 4a            	dec	a
+3709  01e8 2741          	jreq	L5222
+3710  01ea 4a            	dec	a
+3711  01eb 274d          	jreq	L7222
+3712  01ed acef02ef      	jpf	L1052
+3713  01f1               L5122:
+3714                     ; 119 				case STATE0:	PWM_Config(100, 0);	break;//never run to STATE0
+3716  01f1 5f            	clrw	x
+3717  01f2 89            	pushw	x
+3718  01f3 ae0064        	ldw	x,#100
+3719  01f6 cd0000        	call	_PWM_Config
+3721  01f9 85            	popw	x
+3724  01fa acef02ef      	jpf	L1052
+3725  01fe               L7122:
+3726                     ; 120 				case STATE1:	PWM_Config(100, 100);	break;
+3728  01fe ae0064        	ldw	x,#100
+3729  0201 89            	pushw	x
+3730  0202 ae0064        	ldw	x,#100
+3731  0205 cd0000        	call	_PWM_Config
+3733  0208 85            	popw	x
+3736  0209 acef02ef      	jpf	L1052
+3737  020d               L1222:
+3738                     ; 121 				case STATE2:	PWM_Config(100, 75);	break;			
+3740  020d ae004b        	ldw	x,#75
+3741  0210 89            	pushw	x
+3742  0211 ae0064        	ldw	x,#100
+3743  0214 cd0000        	call	_PWM_Config
+3745  0217 85            	popw	x
+3748  0218 acef02ef      	jpf	L1052
+3749  021c               L3222:
+3750                     ; 122 				case STATE3:	PWM_Config(100, 50);	break;
+3752  021c ae0032        	ldw	x,#50
+3753  021f 89            	pushw	x
+3754  0220 ae0064        	ldw	x,#100
+3755  0223 cd0000        	call	_PWM_Config
+3757  0226 85            	popw	x
+3760  0227 acef02ef      	jpf	L1052
+3761  022b               L5222:
+3762                     ; 123 				case STATE4:	PWM_Config(100, 60);	break;
+3764  022b ae003c        	ldw	x,#60
+3765  022e 89            	pushw	x
+3766  022f ae0064        	ldw	x,#100
+3767  0232 cd0000        	call	_PWM_Config
+3769  0235 85            	popw	x
+3772  0236 acef02ef      	jpf	L1052
+3773  023a               L7222:
+3774                     ; 124 				case STATE5:	PWM_Config(100, 60);	break;
+3776  023a ae003c        	ldw	x,#60
+3777  023d 89            	pushw	x
+3778  023e ae0064        	ldw	x,#100
+3779  0241 cd0000        	call	_PWM_Config
+3781  0244 85            	popw	x
+3784  0245 acef02ef      	jpf	L1052
+3785  0249               L1322:
+3786                     ; 125 				default: break;
+3788  0249 acef02ef      	jpf	L1052
+3789  024d               L1642:
+3791  024d acef02ef      	jpf	L1052
+3792  0251               L5542:
+3793                     ; 128 		else if(mode == MODE6)
+3795  0251 7b01          	ld	a,(OFST+1,sp)
+3796  0253 a106          	cp	a,#6
+3797  0255 2657          	jrne	L5642
+3798                     ; 130 			switch (state)
+3800  0257 b600          	ld	a,_state
+3802                     ; 137 				default: break;
+3803  0259 4d            	tnz	a
+3804  025a 270f          	jreq	L3322
+3805  025c 4a            	dec	a
+3806  025d 2717          	jreq	L5322
+3807  025f 4a            	dec	a
+3808  0260 2721          	jreq	L7322
+3809  0262 4a            	dec	a
+3810  0263 272b          	jreq	L1422
+3811  0265 4a            	dec	a
+3812  0266 2735          	jreq	L3422
+3813  0268 cc02ef        	jra	L1052
+3814  026b               L3322:
+3815                     ; 132 				case STATE0:	PWM_Config(100, 0);	break;//never run to STATE0
+3817  026b 5f            	clrw	x
+3818  026c 89            	pushw	x
+3819  026d ae0064        	ldw	x,#100
+3820  0270 cd0000        	call	_PWM_Config
+3822  0273 85            	popw	x
+3825  0274 2079          	jra	L1052
+3826  0276               L5322:
+3827                     ; 133 				case STATE1:	PWM_Config(100, 100);	break;
+3829  0276 ae0064        	ldw	x,#100
+3830  0279 89            	pushw	x
+3831  027a ae0064        	ldw	x,#100
+3832  027d cd0000        	call	_PWM_Config
+3834  0280 85            	popw	x
+3837  0281 206c          	jra	L1052
+3838  0283               L7322:
+3839                     ; 134 				case STATE2:	PWM_Config(100, 60);	break;			
+3841  0283 ae003c        	ldw	x,#60
+3842  0286 89            	pushw	x
+3843  0287 ae0064        	ldw	x,#100
+3844  028a cd0000        	call	_PWM_Config
+3846  028d 85            	popw	x
+3849  028e 205f          	jra	L1052
+3850  0290               L1422:
+3851                     ; 135 				case STATE3:	PWM_Config(100, 40+2);	break;
+3853  0290 ae002a        	ldw	x,#42
+3854  0293 89            	pushw	x
+3855  0294 ae0064        	ldw	x,#100
+3856  0297 cd0000        	call	_PWM_Config
+3858  029a 85            	popw	x
+3861  029b 2052          	jra	L1052
+3862  029d               L3422:
+3863                     ; 136 				case STATE4:	PWM_Config(100, 50+1);	break;
+3865  029d ae0033        	ldw	x,#51
+3866  02a0 89            	pushw	x
+3867  02a1 ae0064        	ldw	x,#100
+3868  02a4 cd0000        	call	_PWM_Config
+3870  02a7 85            	popw	x
+3873  02a8 2045          	jra	L1052
+3874  02aa               L5422:
+3875                     ; 137 				default: break;
+3877  02aa 2043          	jra	L1052
+3878  02ac               L1742:
+3880  02ac 2041          	jra	L1052
+3881  02ae               L5642:
+3882                     ; 142 			switch (state)
+3884  02ae b600          	ld	a,_state
+3886                     ; 148 				default: break;
+3887  02b0 4d            	tnz	a
+3888  02b1 270b          	jreq	L7422
+3889  02b3 4a            	dec	a
+3890  02b4 2713          	jreq	L1522
+3891  02b6 4a            	dec	a
+3892  02b7 271d          	jreq	L3522
+3893  02b9 4a            	dec	a
+3894  02ba 2728          	jreq	L5522
+3895  02bc 2031          	jra	L1052
+3896  02be               L7422:
+3897                     ; 144 				case STATE0:	PWM_Config(100, 0);	break;//never run to STATE0
+3899  02be 5f            	clrw	x
+3900  02bf 89            	pushw	x
+3901  02c0 ae0064        	ldw	x,#100
+3902  02c3 cd0000        	call	_PWM_Config
+3904  02c6 85            	popw	x
+3907  02c7 2026          	jra	L1052
+3908  02c9               L1522:
+3909                     ; 145 				case STATE1:	PWM_Config(100, 100);	break;
+3911  02c9 ae0064        	ldw	x,#100
+3912  02cc 89            	pushw	x
+3913  02cd ae0064        	ldw	x,#100
+3914  02d0 cd0000        	call	_PWM_Config
+3916  02d3 85            	popw	x
+3919  02d4 2019          	jra	L1052
+3920  02d6               L3522:
+3921                     ; 146 				case STATE2:	PWM_Config(100, brightness);	break;			
+3923  02d6 b600          	ld	a,_brightness
+3924  02d8 5f            	clrw	x
+3925  02d9 97            	ld	xl,a
+3926  02da 89            	pushw	x
+3927  02db ae0064        	ldw	x,#100
+3928  02de cd0000        	call	_PWM_Config
+3930  02e1 85            	popw	x
+3933  02e2 200b          	jra	L1052
+3934  02e4               L5522:
+3935                     ; 147 				case STATE3:	PWM_Config(100, 80);	break;			
+3937  02e4 ae0050        	ldw	x,#80
+3938  02e7 89            	pushw	x
+3939  02e8 ae0064        	ldw	x,#100
+3940  02eb cd0000        	call	_PWM_Config
+3942  02ee 85            	popw	x
+3945  02ef               L7522:
+3946                     ; 148 				default: break;
+3948  02ef               L7742:
+3949  02ef               L1052:
+3950                     ; 152 	ex_state = state;
+3952  02ef 450008        	mov	L3712_ex_state,_state
+3953                     ; 153 }
+3956  02f2 84            	pop	a
+3957  02f3 81            	ret
+3960                     	bsct
+3961  0009               L3052_adcCount:
+3962  0009 00            	dc.b	0
+3963  000a               L5052_adcData:
+3964  000a 0000          	dc.w	0
+3965  000c 0000          	dc.w	0
+3966  000e 0000          	dc.w	0
+3967  0010 0000          	dc.w	0
+3968  0012 0000          	dc.w	0
+4056                     ; 156 main()
+4056                     ; 157 {
+4057                     	switch	.text
+4058  02f4               _main:
+4060  02f4 88            	push	a
+4061       00000001      OFST:	set	1
+4064                     ; 160 	bool exRelayStat = OFF;
+4066  02f5 a601          	ld	a,#1
+4067  02f7 6b01          	ld	(OFST+0,sp),a
+4068                     ; 163 	CLK_CKDIVR = 0x08;//f = f HSI RC输出/2=8MHz
+4070  02f9 350850c6      	mov	_CLK_CKDIVR,#8
+4071                     ; 166 	Delay(); Delay(); Delay(); Delay(); Delay(); //about 5s
+4073  02fd cd0000        	call	_Delay
+4077  0300 cd0000        	call	_Delay
+4081  0303 cd0000        	call	_Delay
+4085  0306 cd0000        	call	_Delay
+4089  0309 cd0000        	call	_Delay
+4091                     ; 170 	PWM_GPIO_Config();
+4093  030c cd0000        	call	_PWM_GPIO_Config
+4095                     ; 173 	InitADC();	
+4097  030f cd0000        	call	_InitADC
+4099                     ; 174 	adcData[0] = adcData[1] = adcData[2] = adcData[3] = adcData[4] = GetADC();
+4101  0312 cd0000        	call	_GetADC
+4103  0315 bf12          	ldw	L5052_adcData+8,x
+4104  0317 be12          	ldw	x,L5052_adcData+8
+4105  0319 bf10          	ldw	L5052_adcData+6,x
+4106  031b be10          	ldw	x,L5052_adcData+6
+4107  031d bf0e          	ldw	L5052_adcData+4,x
+4108  031f be0e          	ldw	x,L5052_adcData+4
+4109  0321 bf0c          	ldw	L5052_adcData+2,x
+4110  0323 be0c          	ldw	x,L5052_adcData+2
+4111  0325 bf0a          	ldw	L5052_adcData,x
+4112                     ; 175 	Rly_GPIO_Config();
+4114  0327 cd0000        	call	_Rly_GPIO_Config
+4116                     ; 176 	if(adcData[0] < ON_LUX)//initial LIGHT IO
+4118  032a be0a          	ldw	x,L5052_adcData
+4119  032c a312c0        	cpw	x,#4800
+4120  032f 240f          	jruge	L5452
+4121                     ; 178 		LIGHT = OFF;
+4123  0331 721a500a      	bset	_PC_ODR_5
+4124                     ; 179 		PWM_Config(100, 0);//PWM off
+4126  0335 5f            	clrw	x
+4127  0336 89            	pushw	x
+4128  0337 ae0064        	ldw	x,#100
+4129  033a cd0000        	call	_PWM_Config
+4131  033d 85            	popw	x
+4133  033e 200f          	jra	L7452
+4134  0340               L5452:
+4135                     ; 183 		LIGHT = ON;
+4137  0340 721b500a      	bres	_PC_ODR_5
+4138                     ; 184 		PWM_Config(100, 100);//PWM off
+4140  0344 ae0064        	ldw	x,#100
+4141  0347 89            	pushw	x
+4142  0348 ae0064        	ldw	x,#100
+4143  034b cd0000        	call	_PWM_Config
+4145  034e 85            	popw	x
+4146  034f               L7452:
+4147                     ; 188 	TIM1_Init();
+4149  034f cd0000        	call	_TIM1_Init
+4151  0352               L1552:
+4152                     ; 192 		adcData[adcCount++] = GetADC();
+4154  0352 cd0000        	call	_GetADC
+4156  0355 b609          	ld	a,L3052_adcCount
+4157  0357 9097          	ld	yl,a
+4158  0359 3c09          	inc	L3052_adcCount
+4159  035b 909f          	ld	a,yl
+4160  035d 905f          	clrw	y
+4161  035f 9097          	ld	yl,a
+4162  0361 9058          	sllw	y
+4163  0363 90ef0a        	ldw	(L5052_adcData,y),x
+4164                     ; 193 		if(adcCount > 4)	adcCount = 0;
+4166  0366 b609          	ld	a,L3052_adcCount
+4167  0368 a105          	cp	a,#5
+4168  036a 2502          	jrult	L5552
+4171  036c 3f09          	clr	L3052_adcCount
+4172  036e               L5552:
+4173                     ; 196 		if(adcData[0] < OFF_LUX \
+4173                     ; 197 		&& adcData[1] < OFF_LUX \
+4173                     ; 198 		&& adcData[2] < OFF_LUX \
+4173                     ; 199 		&& adcData[3] < OFF_LUX \
+4173                     ; 200 		&& adcData[4] < OFF_LUX)
+4175  036e be0a          	ldw	x,L5052_adcData
+4176  0370 a310cc        	cpw	x,#4300
+4177  0373 2444          	jruge	L7552
+4179  0375 be0c          	ldw	x,L5052_adcData+2
+4180  0377 a310cc        	cpw	x,#4300
+4181  037a 243d          	jruge	L7552
+4183  037c be0e          	ldw	x,L5052_adcData+4
+4184  037e a310cc        	cpw	x,#4300
+4185  0381 2436          	jruge	L7552
+4187  0383 be10          	ldw	x,L5052_adcData+6
+4188  0385 a310cc        	cpw	x,#4300
+4189  0388 242f          	jruge	L7552
+4191  038a be12          	ldw	x,L5052_adcData+8
+4192  038c a310cc        	cpw	x,#4300
+4193  038f 2428          	jruge	L7552
+4194                     ; 202 			if(LIGHT == ON)//only when light on/off change 
+4196                     	btst	_PC_ODR_5
+4197  0396 2511          	jrult	L1652
+4198                     ; 204 				LIGHT = OFF;//Relay_IO = 1
+4200  0398 721a500a      	bset	_PC_ODR_5
+4201                     ; 205 				PWM_Config(100, 0);//PWM off
+4203  039c 5f            	clrw	x
+4204  039d 89            	pushw	x
+4205  039e ae0064        	ldw	x,#100
+4206  03a1 cd0000        	call	_PWM_Config
+4208  03a4 85            	popw	x
+4209                     ; 206 				TIM1_CR1 &= 0xFE;//stop time counter
+4211  03a5 72115250      	bres	_TIM1_CR1,#0
+4212  03a9               L1652:
+4213                     ; 208 			if(state != STATE0)
+4215  03a9 3d00          	tnz	_state
+4216  03ab 2704          	jreq	L3652
+4217                     ; 209 				ex_state = state = STATE0;
+4219  03ad 3f00          	clr	_state
+4220  03af 3f08          	clr	L3712_ex_state
+4221  03b1               L3652:
+4222                     ; 211 			second = 0;
+4224  03b1 5f            	clrw	x
+4225  03b2 bf01          	ldw	_second,x
+4226                     ; 212 			hour = 0;
+4228  03b4 5f            	clrw	x
+4229  03b5 bf03          	ldw	_hour,x
+4231  03b7 2052          	jra	L5652
+4232  03b9               L7552:
+4233                     ; 215 		else if(adcData[0] > ON_LUX \
+4233                     ; 216 		&& adcData[1] > ON_LUX \
+4233                     ; 217 		&& adcData[2] > ON_LUX \
+4233                     ; 218 		&& adcData[3] > ON_LUX \
+4233                     ; 219 		&& adcData[4] > ON_LUX)
+4235  03b9 be0a          	ldw	x,L5052_adcData
+4236  03bb a312c1        	cpw	x,#4801
+4237  03be 254b          	jrult	L5652
+4239  03c0 be0c          	ldw	x,L5052_adcData+2
+4240  03c2 a312c1        	cpw	x,#4801
+4241  03c5 2544          	jrult	L5652
+4243  03c7 be0e          	ldw	x,L5052_adcData+4
+4244  03c9 a312c1        	cpw	x,#4801
+4245  03cc 253d          	jrult	L5652
+4247  03ce be10          	ldw	x,L5052_adcData+6
+4248  03d0 a312c1        	cpw	x,#4801
+4249  03d3 2536          	jrult	L5652
+4251  03d5 be12          	ldw	x,L5052_adcData+8
+4252  03d7 a312c1        	cpw	x,#4801
+4253  03da 252f          	jrult	L5652
+4254                     ; 221 			if(LIGHT == OFF)//only when light on/off change 
+4256                     	btst	_PC_ODR_5
+4257  03e1 2404          	jruge	L1752
+4258                     ; 223 				LIGHT = ON;
+4260  03e3 721b500a      	bres	_PC_ODR_5
+4261  03e7               L1752:
+4262                     ; 225 			if((TIM1_CR1 & 0x01) == 0)//if time counter not started, start counting
+4264  03e7 c65250        	ld	a,_TIM1_CR1
+4265  03ea a501          	bcp	a,#1
+4266  03ec 260e          	jrne	L3752
+4267                     ; 227 				second = 0;
+4269  03ee 5f            	clrw	x
+4270  03ef bf01          	ldw	_second,x
+4271                     ; 228 				hour = 0;
+4273  03f1 5f            	clrw	x
+4274  03f2 bf03          	ldw	_hour,x
+4275                     ; 229 				TIM1_CR1 |= 0x01;//start time counter
+4277  03f4 72105250      	bset	_TIM1_CR1,#0
+4278                     ; 230 				TIM1_IER |= 0x01;				
+4280  03f8 72105254      	bset	_TIM1_IER,#0
+4281  03fc               L3752:
+4282                     ; 232 			if(state == STATE0)
+4284  03fc 3d00          	tnz	_state
+4285  03fe 260b          	jrne	L5652
+4286                     ; 234 				PWM_Config(100, 100);
+4288  0400 ae0064        	ldw	x,#100
+4289  0403 89            	pushw	x
+4290  0404 ae0064        	ldw	x,#100
+4291  0407 cd0000        	call	_PWM_Config
+4293  040a 85            	popw	x
+4294  040b               L5652:
+4295                     ; 239 		DimmingMode(userMode);
+4297  040b 4f            	clr	a
+4298  040c cd0000        	call	_DimmingMode
+4300                     ; 240 		Delay();
+4302  040f cd0000        	call	_Delay
+4305  0412 ac520352      	jpf	L1552
+4343                     ; 245 @far @interrupt void TIM1_UPD_IRQHandler(void)
+4343                     ; 246 {
+4345                     	switch	.text
+4346  0416               f_TIM1_UPD_IRQHandler:
+4349       00000001      OFST:	set	1
+4350  0416 88            	push	a
+4353                     ; 247 	unsigned char i = 0;
+4355  0417 0f01          	clr	(OFST+0,sp)
+4356                     ; 248 	TIM1_SR1 &= 0xFE;//clear interrupt label
+4358  0419 72115255      	bres	_TIM1_SR1,#0
+4359                     ; 249 	second++;
+4361  041d be01          	ldw	x,_second
+4362  041f 1c0001        	addw	x,#1
+4363  0422 bf01          	ldw	_second,x
+4364                     ; 250 	if(second >= 3600)/***********待变更！！！！！***************/
+4366  0424 be01          	ldw	x,_second
+4367  0426 a30e10        	cpw	x,#3600
+4368  0429 250a          	jrult	L7162
+4369                     ; 252 		second = 0;
+4371  042b 5f            	clrw	x
+4372  042c bf01          	ldw	_second,x
+4373                     ; 253 		hour += 1;
+4375  042e be03          	ldw	x,_hour
+4376  0430 1c0001        	addw	x,#1
+4377  0433 bf03          	ldw	_hour,x
+4378  0435               L7162:
+4379                     ; 257 }
+4382  0435 84            	pop	a
+4383  0436 80            	iret
+4522                     	xdef	f_TIM1_UPD_IRQHandler
+4523                     	xdef	_main
+4524                     	xdef	_DimmingMode
+4525                     	switch	.ubsct
+4526  0000               _state:
+4527  0000 00            	ds.b	1
+4528                     	xdef	_state
+4529                     	xdef	_relayStat
+4530                     	xdef	_timeChanged
+4531                     	xdef	_isDimmingConfiged
+4532                     	xdef	_brightness
+4533                     	xdef	_hour
+4534                     	xdef	_second
+4535                     	xref	_TIM1_Init
+4536                     	xref	_Delay
+4537                     	xref	_GetADC
+4538                     	xref	_InitADC
+4539                     	xref	_PWM_GPIO_Config
+4540                     	xref	_PWM_Config
+4541                     	xref	_Rly_GPIO_Config
+4561                     	end
