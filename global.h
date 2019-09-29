@@ -16,9 +16,10 @@
 //MODE3 test mode: 0~10S 100%; 10~20s brightness%; >20s 100%
 //MODE4 AC 1h 80%--> 3h 100%--> 1h 70%--> 7h 50%
 //MODE5 Mr Xie 5h 100% --> 2h 75% --> 4h 50% --> 1h 60%
-//MODE6 test1: 5s 100% --> 2s 50% --> 4s 30% --> 1s 80%
-#define userMode MODE0//userMode(MODE0~MODExx),need confirm
+//MODE6 test1: 4h 100% --> 3h 60% --> 4h 40% --> 1h 50%
+#define userMode MODE6//userMode(MODE0~MODExx),need confirm
 #define BRIGHTNESS	43//lower than 50% should be add 1~5, the small the larger added.
+#define DELAY	10//5S
 //BRIGHTNESS smaller than 50: 50+1 / 40+2 / 30+3 / 20+4 / 10+5
 
 extern unsigned int second;

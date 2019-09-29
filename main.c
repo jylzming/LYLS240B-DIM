@@ -56,11 +56,11 @@ void DimmingMode(Mode mode)
 			break;	
 			
 			case MODE3: 	
-				if(second >= 0 && second < 3)
+				if(second >= 0 && second < 10)
 					state = STATE1;
-				else if(second >= 3 && second < 6)//(hour >= 6 && hour < 10)
+				else if(second >= 10 && second < 20)//(hour >= 6 && hour < 10)
 					state = STATE2;
-				else if(second >= 6 && second < 9) 
+				else if(second >= 20 && second < 30) 
 					state = STATE3;	
 				else
 				{
@@ -105,7 +105,7 @@ void DimmingMode(Mode mode)
 				else
 					state = STATE4;
 			break;
-			
+
 			default:	break;
 		}
 	}
@@ -131,9 +131,9 @@ void DimmingMode(Mode mode)
 			{
 				case STATE0:	PWM_Config(100, 0);	break;//never run to STATE0
 				case STATE1:	PWM_Config(100, 100);	break;
-				case STATE2:	PWM_Config(100, 60);	break;			
-				case STATE3:	PWM_Config(100, 40+2);	break;
-				case STATE4:	PWM_Config(100, 50+1);	break;
+				case STATE2:	PWM_Config(100, 60+1);	break;			
+				case STATE3:	PWM_Config(100, 40+3);	break;
+				case STATE4:	PWM_Config(100, 50+2);	break;
 				default: break;
 			}		
 		}		
@@ -156,9 +156,11 @@ void DimmingMode(Mode mode)
 main()
 {
 	volatile static unsigned char adcCount = 0;
-	unsigned int x,y;
+	volatile unsigned char offCount = 0;
+	volatile unsigned char onCount = 0;	
+	unsigned int i,x,y;
 	bool exRelayStat = OFF;
-	static unsigned int adcData[5] = {0,0,0,0,0};
+	static unsigned int adcData[DELAY] = {0};
 	
 	CLK_CKDIVR = 0x08;//f = f HSI RCÊä³ö/2=8MHz
 	
@@ -171,7 +173,11 @@ main()
 	
 	//Get ADC initial data and check the light ON/OFF state
 	InitADC();	
-	adcData[0] = adcData[1] = adcData[2] = adcData[3] = adcData[4] = GetADC();
+	//adcData[0] = adcData[1] = adcData[2] = adcData[3] = adcData[4] = GetADC();
+	for(i=0;i<DELAY;i++)
+	{
+		adcData[i] = GetADC();
+	}
 	Rly_GPIO_Config();
 	if(adcData[0] < ON_LUX)//initial LIGHT IO
 	{
@@ -186,8 +192,65 @@ main()
 
 	//Time1 use for time counter, 1S/interrupt service
 	TIM1_Init();
+	while(1)
+	{
+		adcData[adcCount++] = GetADC();
+		if(adcCount >= DELAY)	
+			adcCount = 0;
+		
+		//only when all data is lager than ON or small than OFF
+		for(i=0; i<DELAY;i++)
+		{
+			if(adcData[i] < OFF_LUX)
+				offCount += 1;
+			else if(adcData[i] > ON_LUX)
+				onCount += 1;
+			else;//do nothing
+		}
+		//if it's daytime, turn the light OFF
+		if(offCount >= DELAY)
+		{
+			if(LIGHT == ON)//only when light on/off change 
+			{
+				LIGHT = OFF;//Relay_IO = 1
+				PWM_Config(100, 0);//PWM off
+				TIM1_CR1 &= 0xFE;//stop time counter
+			}
+			if(state != STATE0)
+				ex_state = state = STATE0;
+				
+			second = 0;
+			hour = 0;
+		}
+		//if it's nighttime, turn the light ON
+		else if(onCount >= DELAY)
+		{
+			if(LIGHT == OFF)//only when light on/off change 
+			{
+				LIGHT = ON;
+			}	
+			if((TIM1_CR1 & 0x01) == 0)//if time counter not started, start counting
+			{
+				second = 0;
+				hour = 0;
+				TIM1_CR1 |= 0x01;//start time counter
+				TIM1_IER |= 0x01;				
+			}
+			if(state == STATE0)
+			{
+				PWM_Config(100, 100);
+			}
+		}
+		else;//between ON/OFF, do nothing
+		
+		offCount = 0;
+		onCount  = 0;	
+		DimmingMode(userMode);
+		Delay500ms();
+		//Delay50us();
+	}
 	
-	while (1)
+	while (0)
 	{
 		adcData[adcCount++] = GetADC();
 		if(adcCount > 4)	adcCount = 0;
@@ -255,3 +318,5 @@ main()
 			hour = 0;
 	}
 }
+
+

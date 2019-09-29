@@ -12,6 +12,14 @@ void Delay(void)
 		for(j=0; j<512; j++); 
 	}
 }
+void Delay500ms(void)
+{
+	volatile unsigned int i,j;
+	for(i=0; i<555; i++)//for(i=0; i<1024; i++)
+	{
+		for(j=0; j<512; j++); 
+	}
+}
 
 void TIM1_Init(void)
 {

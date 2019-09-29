@@ -5,6 +5,7 @@
 #include "stm8s_bit.h"
 
 void Delay(void);
+void Delay500ms(void);
 void TIM1_Init(void);
 
 #endif

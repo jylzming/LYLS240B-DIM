@@ -120,31 +120,31 @@
 3462  00a7 acca01ca      	jpf	L7232
 3463  00ab               L3022:
 3464                     ; 58 			case MODE3: 	
-3464                     ; 59 				if(second >= 0 && second < 3)
+3464                     ; 59 				if(second >= 0 && second < 10)
 3466  00ab be01          	ldw	x,_second
-3467  00ad a30003        	cpw	x,#3
+3467  00ad a3000a        	cpw	x,#10
 3468  00b0 2408          	jruge	L3632
 3469                     ; 60 					state = STATE1;
 3471  00b2 35010000      	mov	_state,#1
 3473  00b6 acca01ca      	jpf	L7232
 3474  00ba               L3632:
-3475                     ; 61 				else if(second >= 3 && second < 6)//(hour >= 6 && hour < 10)
+3475                     ; 61 				else if(second >= 10 && second < 20)//(hour >= 6 && hour < 10)
 3477  00ba be01          	ldw	x,_second
-3478  00bc a30003        	cpw	x,#3
+3478  00bc a3000a        	cpw	x,#10
 3479  00bf 250f          	jrult	L7632
 3481  00c1 be01          	ldw	x,_second
-3482  00c3 a30006        	cpw	x,#6
+3482  00c3 a30014        	cpw	x,#20
 3483  00c6 2408          	jruge	L7632
 3484                     ; 62 					state = STATE2;
 3486  00c8 35020000      	mov	_state,#2
 3488  00cc acca01ca      	jpf	L7232
 3489  00d0               L7632:
-3490                     ; 63 				else if(second >= 6 && second < 9) 
+3490                     ; 63 				else if(second >= 20 && second < 30) 
 3492  00d0 be01          	ldw	x,_second
-3493  00d2 a30006        	cpw	x,#6
+3493  00d2 a30014        	cpw	x,#20
 3494  00d5 250f          	jrult	L3732
 3496  00d7 be01          	ldw	x,_second
-3497  00d9 a30009        	cpw	x,#9
+3497  00d9 a3001e        	cpw	x,#30
 3498  00dc 2408          	jruge	L3732
 3499                     ; 64 					state = STATE3;	
 3501  00de 35030000      	mov	_state,#3
@@ -399,24 +399,24 @@
 3834  0280 85            	popw	x
 3837  0281 206c          	jra	L1052
 3838  0283               L7322:
-3839                     ; 134 				case STATE2:	PWM_Config(100, 60);	break;			
-3841  0283 ae003c        	ldw	x,#60
+3839                     ; 134 				case STATE2:	PWM_Config(100, 60+1);	break;			
+3841  0283 ae003d        	ldw	x,#61
 3842  0286 89            	pushw	x
 3843  0287 ae0064        	ldw	x,#100
 3844  028a cd0000        	call	_PWM_Config
 3846  028d 85            	popw	x
 3849  028e 205f          	jra	L1052
 3850  0290               L1422:
-3851                     ; 135 				case STATE3:	PWM_Config(100, 40+2);	break;
-3853  0290 ae002a        	ldw	x,#42
+3851                     ; 135 				case STATE3:	PWM_Config(100, 40+3);	break;
+3853  0290 ae002b        	ldw	x,#43
 3854  0293 89            	pushw	x
 3855  0294 ae0064        	ldw	x,#100
 3856  0297 cd0000        	call	_PWM_Config
 3858  029a 85            	popw	x
 3861  029b 2052          	jra	L1052
 3862  029d               L3422:
-3863                     ; 136 				case STATE4:	PWM_Config(100, 50+1);	break;
-3865  029d ae0033        	ldw	x,#51
+3863                     ; 136 				case STATE4:	PWM_Config(100, 50+2);	break;
+3865  029d ae0034        	ldw	x,#52
 3866  02a0 89            	pushw	x
 3867  02a1 ae0064        	ldw	x,#100
 3868  02a4 cd0000        	call	_PWM_Config
@@ -487,239 +487,251 @@
 3962  0009 00            	dc.b	0
 3963  000a               L5052_adcData:
 3964  000a 0000          	dc.w	0
-3965  000c 0000          	dc.w	0
-3966  000e 0000          	dc.w	0
-3967  0010 0000          	dc.w	0
-3968  0012 0000          	dc.w	0
-4056                     ; 156 main()
-4056                     ; 157 {
-4057                     	switch	.text
-4058  02f4               _main:
-4060  02f4 88            	push	a
-4061       00000001      OFST:	set	1
-4064                     ; 160 	bool exRelayStat = OFF;
-4066  02f5 a601          	ld	a,#1
-4067  02f7 6b01          	ld	(OFST+0,sp),a
-4068                     ; 163 	CLK_CKDIVR = 0x08;//f = f HSI RC输出/2=8MHz
-4070  02f9 350850c6      	mov	_CLK_CKDIVR,#8
-4071                     ; 166 	Delay(); Delay(); Delay(); Delay(); Delay(); //about 5s
-4073  02fd cd0000        	call	_Delay
-4077  0300 cd0000        	call	_Delay
-4081  0303 cd0000        	call	_Delay
-4085  0306 cd0000        	call	_Delay
-4089  0309 cd0000        	call	_Delay
-4091                     ; 170 	PWM_GPIO_Config();
-4093  030c cd0000        	call	_PWM_GPIO_Config
-4095                     ; 173 	InitADC();	
-4097  030f cd0000        	call	_InitADC
-4099                     ; 174 	adcData[0] = adcData[1] = adcData[2] = adcData[3] = adcData[4] = GetADC();
-4101  0312 cd0000        	call	_GetADC
-4103  0315 bf12          	ldw	L5052_adcData+8,x
-4104  0317 be12          	ldw	x,L5052_adcData+8
-4105  0319 bf10          	ldw	L5052_adcData+6,x
-4106  031b be10          	ldw	x,L5052_adcData+6
-4107  031d bf0e          	ldw	L5052_adcData+4,x
-4108  031f be0e          	ldw	x,L5052_adcData+4
-4109  0321 bf0c          	ldw	L5052_adcData+2,x
-4110  0323 be0c          	ldw	x,L5052_adcData+2
-4111  0325 bf0a          	ldw	L5052_adcData,x
-4112                     ; 175 	Rly_GPIO_Config();
-4114  0327 cd0000        	call	_Rly_GPIO_Config
-4116                     ; 176 	if(adcData[0] < ON_LUX)//initial LIGHT IO
-4118  032a be0a          	ldw	x,L5052_adcData
-4119  032c a312c0        	cpw	x,#4800
-4120  032f 240f          	jruge	L5452
-4121                     ; 178 		LIGHT = OFF;
-4123  0331 721a500a      	bset	_PC_ODR_5
-4124                     ; 179 		PWM_Config(100, 0);//PWM off
-4126  0335 5f            	clrw	x
-4127  0336 89            	pushw	x
-4128  0337 ae0064        	ldw	x,#100
-4129  033a cd0000        	call	_PWM_Config
-4131  033d 85            	popw	x
-4133  033e 200f          	jra	L7452
-4134  0340               L5452:
-4135                     ; 183 		LIGHT = ON;
-4137  0340 721b500a      	bres	_PC_ODR_5
-4138                     ; 184 		PWM_Config(100, 100);//PWM off
-4140  0344 ae0064        	ldw	x,#100
-4141  0347 89            	pushw	x
-4142  0348 ae0064        	ldw	x,#100
-4143  034b cd0000        	call	_PWM_Config
-4145  034e 85            	popw	x
-4146  034f               L7452:
-4147                     ; 188 	TIM1_Init();
-4149  034f cd0000        	call	_TIM1_Init
-4151  0352               L1552:
-4152                     ; 192 		adcData[adcCount++] = GetADC();
-4154  0352 cd0000        	call	_GetADC
-4156  0355 b609          	ld	a,L3052_adcCount
-4157  0357 9097          	ld	yl,a
-4158  0359 3c09          	inc	L3052_adcCount
-4159  035b 909f          	ld	a,yl
-4160  035d 905f          	clrw	y
-4161  035f 9097          	ld	yl,a
-4162  0361 9058          	sllw	y
-4163  0363 90ef0a        	ldw	(L5052_adcData,y),x
-4164                     ; 193 		if(adcCount > 4)	adcCount = 0;
-4166  0366 b609          	ld	a,L3052_adcCount
-4167  0368 a105          	cp	a,#5
-4168  036a 2502          	jrult	L5552
-4171  036c 3f09          	clr	L3052_adcCount
-4172  036e               L5552:
-4173                     ; 196 		if(adcData[0] < OFF_LUX \
-4173                     ; 197 		&& adcData[1] < OFF_LUX \
-4173                     ; 198 		&& adcData[2] < OFF_LUX \
-4173                     ; 199 		&& adcData[3] < OFF_LUX \
-4173                     ; 200 		&& adcData[4] < OFF_LUX)
-4175  036e be0a          	ldw	x,L5052_adcData
-4176  0370 a310cc        	cpw	x,#4300
-4177  0373 2444          	jruge	L7552
-4179  0375 be0c          	ldw	x,L5052_adcData+2
-4180  0377 a310cc        	cpw	x,#4300
-4181  037a 243d          	jruge	L7552
-4183  037c be0e          	ldw	x,L5052_adcData+4
-4184  037e a310cc        	cpw	x,#4300
-4185  0381 2436          	jruge	L7552
-4187  0383 be10          	ldw	x,L5052_adcData+6
-4188  0385 a310cc        	cpw	x,#4300
-4189  0388 242f          	jruge	L7552
-4191  038a be12          	ldw	x,L5052_adcData+8
-4192  038c a310cc        	cpw	x,#4300
-4193  038f 2428          	jruge	L7552
-4194                     ; 202 			if(LIGHT == ON)//only when light on/off change 
-4196                     	btst	_PC_ODR_5
-4197  0396 2511          	jrult	L1652
-4198                     ; 204 				LIGHT = OFF;//Relay_IO = 1
-4200  0398 721a500a      	bset	_PC_ODR_5
-4201                     ; 205 				PWM_Config(100, 0);//PWM off
-4203  039c 5f            	clrw	x
-4204  039d 89            	pushw	x
-4205  039e ae0064        	ldw	x,#100
-4206  03a1 cd0000        	call	_PWM_Config
-4208  03a4 85            	popw	x
-4209                     ; 206 				TIM1_CR1 &= 0xFE;//stop time counter
-4211  03a5 72115250      	bres	_TIM1_CR1,#0
-4212  03a9               L1652:
-4213                     ; 208 			if(state != STATE0)
-4215  03a9 3d00          	tnz	_state
-4216  03ab 2704          	jreq	L3652
-4217                     ; 209 				ex_state = state = STATE0;
-4219  03ad 3f00          	clr	_state
-4220  03af 3f08          	clr	L3712_ex_state
-4221  03b1               L3652:
-4222                     ; 211 			second = 0;
-4224  03b1 5f            	clrw	x
-4225  03b2 bf01          	ldw	_second,x
-4226                     ; 212 			hour = 0;
-4228  03b4 5f            	clrw	x
-4229  03b5 bf03          	ldw	_hour,x
-4231  03b7 2052          	jra	L5652
-4232  03b9               L7552:
-4233                     ; 215 		else if(adcData[0] > ON_LUX \
-4233                     ; 216 		&& adcData[1] > ON_LUX \
-4233                     ; 217 		&& adcData[2] > ON_LUX \
-4233                     ; 218 		&& adcData[3] > ON_LUX \
-4233                     ; 219 		&& adcData[4] > ON_LUX)
-4235  03b9 be0a          	ldw	x,L5052_adcData
-4236  03bb a312c1        	cpw	x,#4801
-4237  03be 254b          	jrult	L5652
-4239  03c0 be0c          	ldw	x,L5052_adcData+2
-4240  03c2 a312c1        	cpw	x,#4801
-4241  03c5 2544          	jrult	L5652
-4243  03c7 be0e          	ldw	x,L5052_adcData+4
-4244  03c9 a312c1        	cpw	x,#4801
-4245  03cc 253d          	jrult	L5652
-4247  03ce be10          	ldw	x,L5052_adcData+6
-4248  03d0 a312c1        	cpw	x,#4801
-4249  03d3 2536          	jrult	L5652
-4251  03d5 be12          	ldw	x,L5052_adcData+8
-4252  03d7 a312c1        	cpw	x,#4801
-4253  03da 252f          	jrult	L5652
-4254                     ; 221 			if(LIGHT == OFF)//only when light on/off change 
-4256                     	btst	_PC_ODR_5
-4257  03e1 2404          	jruge	L1752
-4258                     ; 223 				LIGHT = ON;
-4260  03e3 721b500a      	bres	_PC_ODR_5
-4261  03e7               L1752:
-4262                     ; 225 			if((TIM1_CR1 & 0x01) == 0)//if time counter not started, start counting
-4264  03e7 c65250        	ld	a,_TIM1_CR1
-4265  03ea a501          	bcp	a,#1
-4266  03ec 260e          	jrne	L3752
-4267                     ; 227 				second = 0;
-4269  03ee 5f            	clrw	x
-4270  03ef bf01          	ldw	_second,x
-4271                     ; 228 				hour = 0;
-4273  03f1 5f            	clrw	x
-4274  03f2 bf03          	ldw	_hour,x
-4275                     ; 229 				TIM1_CR1 |= 0x01;//start time counter
-4277  03f4 72105250      	bset	_TIM1_CR1,#0
-4278                     ; 230 				TIM1_IER |= 0x01;				
-4280  03f8 72105254      	bset	_TIM1_IER,#0
-4281  03fc               L3752:
-4282                     ; 232 			if(state == STATE0)
-4284  03fc 3d00          	tnz	_state
-4285  03fe 260b          	jrne	L5652
-4286                     ; 234 				PWM_Config(100, 100);
-4288  0400 ae0064        	ldw	x,#100
-4289  0403 89            	pushw	x
-4290  0404 ae0064        	ldw	x,#100
-4291  0407 cd0000        	call	_PWM_Config
-4293  040a 85            	popw	x
-4294  040b               L5652:
-4295                     ; 239 		DimmingMode(userMode);
-4297  040b 4f            	clr	a
-4298  040c cd0000        	call	_DimmingMode
-4300                     ; 240 		Delay();
-4302  040f cd0000        	call	_Delay
-4305  0412 ac520352      	jpf	L1552
-4343                     ; 245 @far @interrupt void TIM1_UPD_IRQHandler(void)
-4343                     ; 246 {
-4345                     	switch	.text
-4346  0416               f_TIM1_UPD_IRQHandler:
-4349       00000001      OFST:	set	1
-4350  0416 88            	push	a
-4353                     ; 247 	unsigned char i = 0;
-4355  0417 0f01          	clr	(OFST+0,sp)
-4356                     ; 248 	TIM1_SR1 &= 0xFE;//clear interrupt label
-4358  0419 72115255      	bres	_TIM1_SR1,#0
-4359                     ; 249 	second++;
-4361  041d be01          	ldw	x,_second
-4362  041f 1c0001        	addw	x,#1
-4363  0422 bf01          	ldw	_second,x
-4364                     ; 250 	if(second >= 3600)/***********待变更！！！！！***************/
-4366  0424 be01          	ldw	x,_second
-4367  0426 a30e10        	cpw	x,#3600
-4368  0429 250a          	jrult	L7162
-4369                     ; 252 		second = 0;
-4371  042b 5f            	clrw	x
-4372  042c bf01          	ldw	_second,x
-4373                     ; 253 		hour += 1;
-4375  042e be03          	ldw	x,_hour
-4376  0430 1c0001        	addw	x,#1
-4377  0433 bf03          	ldw	_hour,x
-4378  0435               L7162:
-4379                     ; 257 }
-4382  0435 84            	pop	a
-4383  0436 80            	iret
-4522                     	xdef	f_TIM1_UPD_IRQHandler
-4523                     	xdef	_main
-4524                     	xdef	_DimmingMode
-4525                     	switch	.ubsct
-4526  0000               _state:
-4527  0000 00            	ds.b	1
-4528                     	xdef	_state
-4529                     	xdef	_relayStat
-4530                     	xdef	_timeChanged
-4531                     	xdef	_isDimmingConfiged
-4532                     	xdef	_brightness
-4533                     	xdef	_hour
-4534                     	xdef	_second
-4535                     	xref	_TIM1_Init
-4536                     	xref	_Delay
-4537                     	xref	_GetADC
-4538                     	xref	_InitADC
-4539                     	xref	_PWM_GPIO_Config
-4540                     	xref	_PWM_Config
-4541                     	xref	_Rly_GPIO_Config
-4561                     	end
+3965  000c 000000000000  	ds.b	18
+4081                     ; 156 main()
+4081                     ; 157 {
+4082                     	switch	.text
+4083  02f4               _main:
+4085  02f4 5205          	subw	sp,#5
+4086       00000005      OFST:	set	5
+4089                     ; 159 	volatile unsigned char offCount = 0;
+4091  02f6 0f02          	clr	(OFST-3,sp)
+4092                     ; 160 	volatile unsigned char onCount = 0;	
+4094  02f8 0f03          	clr	(OFST-2,sp)
+4095                     ; 162 	bool exRelayStat = OFF;
+4097  02fa a601          	ld	a,#1
+4098  02fc 6b01          	ld	(OFST-4,sp),a
+4099                     ; 165 	CLK_CKDIVR = 0x08;//f = f HSI RC输出/2=8MHz
+4101  02fe 350850c6      	mov	_CLK_CKDIVR,#8
+4102                     ; 168 	Delay(); Delay(); Delay(); Delay(); Delay(); //about 5s
+4104  0302 cd0000        	call	_Delay
+4108  0305 cd0000        	call	_Delay
+4112  0308 cd0000        	call	_Delay
+4116  030b cd0000        	call	_Delay
+4120  030e cd0000        	call	_Delay
+4122                     ; 172 	PWM_GPIO_Config();
+4124  0311 cd0000        	call	_PWM_GPIO_Config
+4126                     ; 175 	InitADC();	
+4128  0314 cd0000        	call	_InitADC
+4130                     ; 177 	for(i=0;i<DELAY;i++)
+4132  0317 5f            	clrw	x
+4133  0318 1f04          	ldw	(OFST-1,sp),x
+4134  031a               L1652:
+4135                     ; 179 		adcData[i] = GetADC();
+4137  031a cd0000        	call	_GetADC
+4139  031d 1604          	ldw	y,(OFST-1,sp)
+4140  031f 9058          	sllw	y
+4141  0321 90ef0a        	ldw	(L5052_adcData,y),x
+4142                     ; 177 	for(i=0;i<DELAY;i++)
+4144  0324 1e04          	ldw	x,(OFST-1,sp)
+4145  0326 1c0001        	addw	x,#1
+4146  0329 1f04          	ldw	(OFST-1,sp),x
+4149  032b 1e04          	ldw	x,(OFST-1,sp)
+4150  032d a3000a        	cpw	x,#10
+4151  0330 25e8          	jrult	L1652
+4152                     ; 181 	Rly_GPIO_Config();
+4154  0332 cd0000        	call	_Rly_GPIO_Config
+4156                     ; 182 	if(adcData[0] < ON_LUX)//initial LIGHT IO
+4158  0335 be0a          	ldw	x,L5052_adcData
+4159  0337 a312c0        	cpw	x,#4800
+4160  033a 240f          	jruge	L7652
+4161                     ; 184 		LIGHT = OFF;
+4163  033c 721a500a      	bset	_PC_ODR_5
+4164                     ; 185 		PWM_Config(100, 0);//PWM off
+4166  0340 5f            	clrw	x
+4167  0341 89            	pushw	x
+4168  0342 ae0064        	ldw	x,#100
+4169  0345 cd0000        	call	_PWM_Config
+4171  0348 85            	popw	x
+4173  0349 200f          	jra	L1752
+4174  034b               L7652:
+4175                     ; 189 		LIGHT = ON;
+4177  034b 721b500a      	bres	_PC_ODR_5
+4178                     ; 190 		PWM_Config(100, 100);//PWM off
+4180  034f ae0064        	ldw	x,#100
+4181  0352 89            	pushw	x
+4182  0353 ae0064        	ldw	x,#100
+4183  0356 cd0000        	call	_PWM_Config
+4185  0359 85            	popw	x
+4186  035a               L1752:
+4187                     ; 194 	TIM1_Init();
+4189  035a cd0000        	call	_TIM1_Init
+4191  035d               L3752:
+4192                     ; 197 		adcData[adcCount++] = GetADC();
+4194  035d cd0000        	call	_GetADC
+4196  0360 b609          	ld	a,L3052_adcCount
+4197  0362 9097          	ld	yl,a
+4198  0364 3c09          	inc	L3052_adcCount
+4199  0366 909f          	ld	a,yl
+4200  0368 905f          	clrw	y
+4201  036a 9097          	ld	yl,a
+4202  036c 9058          	sllw	y
+4203  036e 90ef0a        	ldw	(L5052_adcData,y),x
+4204                     ; 198 		if(adcCount >= DELAY)	
+4206  0371 b609          	ld	a,L3052_adcCount
+4207  0373 a10a          	cp	a,#10
+4208  0375 2502          	jrult	L7752
+4209                     ; 199 			adcCount = 0;
+4211  0377 3f09          	clr	L3052_adcCount
+4212  0379               L7752:
+4213                     ; 202 		for(i=0; i<DELAY;i++)
+4215  0379 5f            	clrw	x
+4216  037a 1f04          	ldw	(OFST-1,sp),x
+4217  037c               L1062:
+4218                     ; 204 			if(adcData[i] < OFF_LUX)
+4220  037c 1e04          	ldw	x,(OFST-1,sp)
+4221  037e 58            	sllw	x
+4222  037f 9093          	ldw	y,x
+4223  0381 90ee0a        	ldw	y,(L5052_adcData,y)
+4224  0384 90a310cc      	cpw	y,#4300
+4225  0388 2404          	jruge	L7062
+4226                     ; 205 				offCount += 1;
+4228  038a 0c02          	inc	(OFST-3,sp)
+4230  038c 2010          	jra	L1162
+4231  038e               L7062:
+4232                     ; 206 			else if(adcData[i] > ON_LUX)
+4234  038e 1e04          	ldw	x,(OFST-1,sp)
+4235  0390 58            	sllw	x
+4236  0391 9093          	ldw	y,x
+4237  0393 90ee0a        	ldw	y,(L5052_adcData,y)
+4238  0396 90a312c1      	cpw	y,#4801
+4239  039a 2502          	jrult	L1162
+4240                     ; 207 				onCount += 1;
+4242  039c 0c03          	inc	(OFST-2,sp)
+4244  039e               L1162:
+4245                     ; 202 		for(i=0; i<DELAY;i++)
+4247  039e 1e04          	ldw	x,(OFST-1,sp)
+4248  03a0 1c0001        	addw	x,#1
+4249  03a3 1f04          	ldw	(OFST-1,sp),x
+4252  03a5 1e04          	ldw	x,(OFST-1,sp)
+4253  03a7 a3000a        	cpw	x,#10
+4254  03aa 25d0          	jrult	L1062
+4255                     ; 211 		if(offCount >= DELAY)
+4257  03ac 7b02          	ld	a,(OFST-3,sp)
+4258  03ae a10a          	cp	a,#10
+4259  03b0 2528          	jrult	L7162
+4260                     ; 213 			if(LIGHT == ON)//only when light on/off change 
+4262                     	btst	_PC_ODR_5
+4263  03b7 2511          	jrult	L1262
+4264                     ; 215 				LIGHT = OFF;//Relay_IO = 1
+4266  03b9 721a500a      	bset	_PC_ODR_5
+4267                     ; 216 				PWM_Config(100, 0);//PWM off
+4269  03bd 5f            	clrw	x
+4270  03be 89            	pushw	x
+4271  03bf ae0064        	ldw	x,#100
+4272  03c2 cd0000        	call	_PWM_Config
+4274  03c5 85            	popw	x
+4275                     ; 217 				TIM1_CR1 &= 0xFE;//stop time counter
+4277  03c6 72115250      	bres	_TIM1_CR1,#0
+4278  03ca               L1262:
+4279                     ; 219 			if(state != STATE0)
+4281  03ca 3d00          	tnz	_state
+4282  03cc 2704          	jreq	L3262
+4283                     ; 220 				ex_state = state = STATE0;
+4285  03ce 3f00          	clr	_state
+4286  03d0 3f08          	clr	L3712_ex_state
+4287  03d2               L3262:
+4288                     ; 222 			second = 0;
+4290  03d2 5f            	clrw	x
+4291  03d3 bf01          	ldw	_second,x
+4292                     ; 223 			hour = 0;
+4294  03d5 5f            	clrw	x
+4295  03d6 bf03          	ldw	_hour,x
+4297  03d8 2035          	jra	L5262
+4298  03da               L7162:
+4299                     ; 226 		else if(onCount >= DELAY)
+4301  03da 7b03          	ld	a,(OFST-2,sp)
+4302  03dc a10a          	cp	a,#10
+4303  03de 252f          	jrult	L5262
+4304                     ; 228 			if(LIGHT == OFF)//only when light on/off change 
+4306                     	btst	_PC_ODR_5
+4307  03e5 2404          	jruge	L1362
+4308                     ; 230 				LIGHT = ON;
+4310  03e7 721b500a      	bres	_PC_ODR_5
+4311  03eb               L1362:
+4312                     ; 232 			if((TIM1_CR1 & 0x01) == 0)//if time counter not started, start counting
+4314  03eb c65250        	ld	a,_TIM1_CR1
+4315  03ee a501          	bcp	a,#1
+4316  03f0 260e          	jrne	L3362
+4317                     ; 234 				second = 0;
+4319  03f2 5f            	clrw	x
+4320  03f3 bf01          	ldw	_second,x
+4321                     ; 235 				hour = 0;
+4323  03f5 5f            	clrw	x
+4324  03f6 bf03          	ldw	_hour,x
+4325                     ; 236 				TIM1_CR1 |= 0x01;//start time counter
+4327  03f8 72105250      	bset	_TIM1_CR1,#0
+4328                     ; 237 				TIM1_IER |= 0x01;				
+4330  03fc 72105254      	bset	_TIM1_IER,#0
+4331  0400               L3362:
+4332                     ; 239 			if(state == STATE0)
+4334  0400 3d00          	tnz	_state
+4335  0402 260b          	jrne	L5262
+4336                     ; 241 				PWM_Config(100, 100);
+4338  0404 ae0064        	ldw	x,#100
+4339  0407 89            	pushw	x
+4340  0408 ae0064        	ldw	x,#100
+4341  040b cd0000        	call	_PWM_Config
+4343  040e 85            	popw	x
+4344  040f               L5262:
+4345                     ; 246 		offCount = 0;
+4347  040f 0f02          	clr	(OFST-3,sp)
+4348                     ; 247 		onCount  = 0;	
+4350  0411 0f03          	clr	(OFST-2,sp)
+4351                     ; 248 		DimmingMode(userMode);
+4353  0413 a606          	ld	a,#6
+4354  0415 cd0000        	call	_DimmingMode
+4356                     ; 249 		Delay500ms();
+4358  0418 cd0000        	call	_Delay500ms
+4361  041b ac5d035d      	jpf	L3752
+4399                     ; 308 @far @interrupt void TIM1_UPD_IRQHandler(void)
+4399                     ; 309 {
+4401                     	switch	.text
+4402  041f               f_TIM1_UPD_IRQHandler:
+4405       00000001      OFST:	set	1
+4406  041f 88            	push	a
+4409                     ; 310 	unsigned char i = 0;
+4411  0420 0f01          	clr	(OFST+0,sp)
+4412                     ; 311 	TIM1_SR1 &= 0xFE;//clear interrupt label
+4414  0422 72115255      	bres	_TIM1_SR1,#0
+4415                     ; 312 	second++;
+4417  0426 be01          	ldw	x,_second
+4418  0428 1c0001        	addw	x,#1
+4419  042b bf01          	ldw	_second,x
+4420                     ; 313 	if(second >= 3600)/***********待变更！！！！！***************/
+4422  042d be01          	ldw	x,_second
+4423  042f a30e10        	cpw	x,#3600
+4424  0432 250a          	jrult	L7562
+4425                     ; 315 		second = 0;
+4427  0434 5f            	clrw	x
+4428  0435 bf01          	ldw	_second,x
+4429                     ; 316 		hour += 1;
+4431  0437 be03          	ldw	x,_hour
+4432  0439 1c0001        	addw	x,#1
+4433  043c bf03          	ldw	_hour,x
+4434  043e               L7562:
+4435                     ; 320 }
+4438  043e 84            	pop	a
+4439  043f 80            	iret
+4578                     	xdef	f_TIM1_UPD_IRQHandler
+4579                     	xdef	_main
+4580                     	xdef	_DimmingMode
+4581                     	switch	.ubsct
+4582  0000               _state:
+4583  0000 00            	ds.b	1
+4584                     	xdef	_state
+4585                     	xdef	_relayStat
+4586                     	xdef	_timeChanged
+4587                     	xdef	_isDimmingConfiged
+4588                     	xdef	_brightness
+4589                     	xdef	_hour
+4590                     	xdef	_second
+4591                     	xref	_TIM1_Init
+4592                     	xref	_Delay500ms
+4593                     	xref	_Delay
+4594                     	xref	_GetADC
+4595                     	xref	_InitADC
+4596                     	xref	_PWM_GPIO_Config
+4597                     	xref	_PWM_Config
+4598                     	xref	_Rly_GPIO_Config
+4618                     	end
